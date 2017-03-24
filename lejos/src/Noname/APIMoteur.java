@@ -2,7 +2,7 @@ package Noname;
 
 public interface APIMoteur {
 
-	public void setSpeed();
+	public void setVitesse(float v);
 	public void reculer();
 	public void avancer();
 	public void tournerDroite();
