@@ -9,6 +9,8 @@ public class Moteurs implements APIMoteurs {
     private EV3LargeRegulatedMotor roueDroite;
     private EV3LargeRegulatedMotor roueGauche;
     
+    private static float maxVitesseGauche = 200;
+    private static float maxVitesseDroit = 200;
     private float vitesseDroit;
     private float vitesseGauche;
     
@@ -23,8 +25,8 @@ public class Moteurs implements APIMoteurs {
     public Moteurs(Constantes roueDroite, Constantes roueGauche){
     	this.roueDroite = new EV3LargeRegulatedMotor(roueDroite.port());
     	this.roueGauche = new EV3LargeRegulatedMotor(roueGauche.port());
-    	this.vitesseDroit = 0;
-    	this.vitesseGauche = 0;
+    	this.vitesseDroit = maxVitesseDroit;
+    	this.vitesseGauche = maxVitesseGauche;
     	this.roueDroite.setSpeed(vitesseDroit);
     	this.roueGauche.setSpeed(vitesseGauche);
     }
@@ -45,8 +47,8 @@ public class Moteurs implements APIMoteurs {
     public Moteurs(Constantes roueDroite, Constantes roueGauche, Constantes pince, boolean estOuvert, float vP){
     	this.roueDroite = new EV3LargeRegulatedMotor(roueDroite.port());
     	this.roueGauche = new EV3LargeRegulatedMotor(roueGauche.port());
-    	this.vitesseDroit = 0;
-    	this.vitesseGauche = 0;
+    	this.vitesseDroit = maxVitesseDroit;
+    	this.vitesseGauche = maxVitesseGauche;
     	this.roueDroite.setSpeed(vitesseDroit);
     	this.roueGauche.setSpeed(vitesseGauche);
     	this.pince = new EV3LargeRegulatedMotor(pince.port());
