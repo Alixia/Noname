@@ -1,5 +1,5 @@
 package Noname;
 
 public enum Couleur {
-	rouge, bleu, vert, noir, blanc, indefini;
+	rouge, bleu, vert, noir, blanc, jaune, gris;
 }

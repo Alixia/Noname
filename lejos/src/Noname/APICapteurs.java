@@ -10,7 +10,7 @@ public interface APICapteurs {
 	/*
 	 * ultrason
 	 */
-	public float detecteObjet();
+	public float distanceVision();
 	
 	/*
 	 * colorimetre
