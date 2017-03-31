@@ -18,7 +18,7 @@ public class Capteurs implements APICapteurs{
 		this.boutonPoussoir = new EV3TouchSensor(Constantes.boutonPoussoir.port());
 		this.colorimetre = new EV3ColorSensor(Constantes.colorimetre.port());
 		this.ultrasons = new EV3UltrasonicSensor(Constantes.ultrasons.port());
-		couleurs = new float[6][1];
+		couleurs = new float[Couleur.values().length][1];
 	}
 	
 	@Override

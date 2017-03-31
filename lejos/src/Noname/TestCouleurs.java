@@ -19,7 +19,7 @@ public class TestCouleurs {
 	private static String tableauString(float[][] tab) {
 		String buffer = "";
 		for (int i = 0; i < Couleur.values().length; i++) {
-			buffer += " " + tab[i];
+			buffer += " " + tab[i][0];
 		}
 		return buffer;
 	}
