@@ -2,14 +2,19 @@ package Noname;
 
 public interface APICapteurs {
 
+	/*
+	 * bouton poussoir
+	 */
 	public boolean boutonEstPresse();
 	
+	/*
+	 * ultrason
+	 */
 	public float detecteObjet();
 	
-	public boolean estRouge();
-	public boolean estblanc();
-	public boolean estNoir();
-	public boolean estBleu();
-	public boolean couleurIndefini();
+	/*
+	 * colorimetre
+	 */
+	public Couleur couleur();
 	
 }

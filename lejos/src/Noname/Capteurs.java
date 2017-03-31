@@ -1,11 +1,26 @@
 package Noname;
 
-public class Capteurs implements APICapteurs{
+import lejos.hardware.port.Port;
+import lejos.hardware.sensor.EV3TouchSensor;
 
+public class Capteurs implements APICapteurs{
+	
+	EV3TouchSensor boutonPoussoir;
+	EV3TouchSensor colorimetre;
+	EV3TouchSensor ultrasons;
+
+	public Capteurs(Port boutonPoussoir, Port colorimetre, Port ultrasons){
+		this.boutonPoussoir = new EV3TouchSensor(boutonPoussoir);
+		this.colorimetre = new EV3TouchSensor(colorimetre);
+		this.ultrasons = new EV3TouchSensor(ultrasons);
+	}
+	
 	@Override
 	public boolean boutonEstPresse() {
-		// TODO Auto-generated method stub
-		return false;
+		float[] sample = new float[1];
+        boutonPoussoir.fetchSample(sample, 0);
+
+        return sample[0] != 0;
 	}
 
 	@Override
@@ -15,33 +30,10 @@ public class Capteurs implements APICapteurs{
 	}
 
 	@Override
-	public boolean estRouge() {
+	public Couleur couleur() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 
-	@Override
-	public boolean estblanc() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean estNoir() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean estBleu() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean couleurIndefini() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 }
