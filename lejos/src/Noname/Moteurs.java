@@ -34,11 +34,13 @@ public class Moteurs implements APIMoteurs {
     /*
      * Constructeur pour manipuler les pinces
      */
-    public Moteurs(Constantes pince, boolean estOuvert, float vP){
+    public Moteurs(Constantes pince, boolean estOuvert, float vitessePince){
     	this.pince = new EV3LargeRegulatedMotor(pince.port());
     	this.vitessePince = vitessePince;
     	this.pince.setSpeed(this.vitessePince);
     	this.estOuvert = estOuvert;
+    	this.vitessePince = vitessePince;
+    	this.pince.setSpeed(this.vitessePince);
     }
     
     /*
