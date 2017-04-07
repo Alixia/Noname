@@ -1,27 +1,12 @@
-package Noname;
+package Noname.Test;
 
-import lejos.utility.Delay;
+import Noname.Pince;
 
 public class PinceTest {
 
-	public static void OuvrirPince(Moteurs m){
-		
-        for (int i = 0; i < 1; i++){
-        	m.ouvrir();
-        }
-	}
-	
-	public static void FermerPince(Moteurs m){
-		
-        for (int i = 0; i < 1; i++){
-        	m.fermer();
-        }
-	}
-
 	public static void main(String[] args) {
-		Moteurs m = new Moteurs(true, 150);
-        FermerPince(m);
-        OuvrirPince(m);
+		Pince P = new Pince();
+        P.calibration();
 	}
 
 }

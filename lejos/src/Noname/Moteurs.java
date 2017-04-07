@@ -30,23 +30,13 @@ public class Moteurs implements APIMoteurs, MoveListener {
     private boolean avance;
     
     private EV3LargeRegulatedMotor pince;
-    private boolean estOuvert;
     private float vitessePince;
     
     
     /*
      * Constructeur pour manipuler les roues et les pinces
      */
-<<<<<<< HEAD
     public Moteurs(float vP){
-    	this.roueDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
-    	this.roueGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
-    	this.vitesseDroit = maxVitesseDroit;
-    	this.vitesseGauche = maxVitesseGauche;
-    	this.roueDroite.setSpeed(vitesseDroit);
-    	this.roueGauche.setSpeed(vitesseGauche);
-=======
-    public Moteurs(boolean estOuvert, float vP){
     	
     	this.rDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
     	this.rGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
@@ -63,7 +53,6 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pilot.setAngularSpeed(maxVitesseRoue);
 		pilot.addMoveListener(this);
     
->>>>>>> branch 'master' of git://github.com/Alixia/Noname.git
     	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
     	this.vitessePince = vP;
     	this.pince.setSpeed(vitessePince);
@@ -109,20 +98,8 @@ public class Moteurs implements APIMoteurs, MoveListener {
 			pince.backward();
 	}
 
-<<<<<<< HEAD
-	
-	public void rotate(int i, boolean left, double speed) {
-		pilot.setAngularSpeed(speed);
-		rotate(i, left, true);
-=======
-	@Override
-	public void actionOuvrir() {
-		pince.forward();		
-	}
-
 	public boolean bouge(){
 		return true;
->>>>>>> branch 'master' of git://github.com/Alixia/Noname.git
 	}
 	
 	@Override
@@ -136,6 +113,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		// TODO Auto-generated method stub
 		avance = false;
 	}
+
 
 	
 }
