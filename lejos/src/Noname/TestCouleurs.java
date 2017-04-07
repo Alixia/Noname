@@ -5,10 +5,13 @@ public class TestCouleurs {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Capteurs capteurs = new Capteurs();
+		Screen screen = new Screen();
+		InputHandler input = new InputHandler(screen);
 
 		for (Couleur c : Couleur.values()) {
-			capteurs.calibrerCouleur(Couleur.rouge);
 			System.out.println("couleur = " + c.name());
+			input.waitAny();
+			capteurs.calibrerCouleur(c);
 			System.out.println("tableur calibrationnage" + tableauString(capteurs.getCalibration()));
 
 		}
