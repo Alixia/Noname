@@ -37,6 +37,15 @@ public class Moteurs implements APIMoteurs, MoveListener {
     /*
      * Constructeur pour manipuler les roues et les pinces
      */
+<<<<<<< HEAD
+    public Moteurs(float vP){
+    	this.roueDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
+    	this.roueGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
+    	this.vitesseDroit = maxVitesseDroit;
+    	this.vitesseGauche = maxVitesseGauche;
+    	this.roueDroite.setSpeed(vitesseDroit);
+    	this.roueGauche.setSpeed(vitesseGauche);
+=======
     public Moteurs(boolean estOuvert, float vP){
     	
     	this.rDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
@@ -54,10 +63,10 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pilot.setAngularSpeed(maxVitesseRoue);
 		pilot.addMoveListener(this);
     
+>>>>>>> branch 'master' of git://github.com/Alixia/Noname.git
     	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
     	this.vitessePince = vP;
     	this.pince.setSpeed(vitessePince);
-    	this.estOuvert = estOuvert;
     }
     
 	public void setVitesse(float v) {
@@ -90,33 +99,22 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		}
 	}
 
-	@Override
-	public void fermer() {
-		if(estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionFermer();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}
-	}
-
-	@Override
-	public void ouvrir() {
-		if(!estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionOuvrir();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}		
+	public void ouvrir(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.forward();
 	}
 	
-	@Override
-	public void actionFermer() {
-		pince.backward();		
+	public void fermer(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.backward();
 	}
 
+<<<<<<< HEAD
+	
+	public void rotate(int i, boolean left, double speed) {
+		pilot.setAngularSpeed(speed);
+		rotate(i, left, true);
+=======
 	@Override
 	public void actionOuvrir() {
 		pince.forward();		
@@ -124,6 +122,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 
 	public boolean bouge(){
 		return true;
+>>>>>>> branch 'master' of git://github.com/Alixia/Noname.git
 	}
 	
 	@Override
