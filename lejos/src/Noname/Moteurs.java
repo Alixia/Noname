@@ -34,43 +34,16 @@ public class Moteurs implements APIMoteurs {
     
     
     /*
-     * Constructeur pour manipuler les roues
-     */
-    public Moteurs(Constantes roueDroite, Constantes roueGauche){
-    	this.roueDroite = new EV3LargeRegulatedMotor(roueDroite.port());
-    	this.roueGauche = new EV3LargeRegulatedMotor(roueGauche.port());
-    	this.vitesseDroit = maxVitesseDroit;
-    	this.vitesseGauche = maxVitesseGauche;
-    	this.roueDroite.setSpeed(vitesseDroit);
-    	this.roueGauche.setSpeed(vitesseGauche);
-    	
-    	left      = WheeledChassis.modelWheel(new EV3LargeRegulatedMotor(LocalEV3.get().getPort(R2D2Constants.LEFT_WHEEL)), 56).offset(-1*R2D2Constants.DISTANCE_TO_CENTER);
-		right     = WheeledChassis.modelWheel(new EV3LargeRegulatedMotor(LocalEV3.get().getPort(R2D2Constants.RIGHT_WHEEL)), 56).offset(R2D2Constants.DISTANCE_TO_CENTER);
-		chassis   = new WheeledChassis(new Wheel[]{left, right},  WheeledChassis.TYPE_DIFFERENTIAL);
-		pilot     = new MovePilot(chassis);
-    }
-    
-    /*
-     * Constructeur pour manipuler les pinces
-     */
-    public Moteurs(Constantes pince, boolean estOuvert, float vP){
-    	this.pince = new EV3LargeRegulatedMotor(pince.port());
-    	this.vitessePince = vP;
-    	this.pince.setSpeed(this.vitessePince);
-    	this.estOuvert = estOuvert;
-    }
-    
-    /*
      * Constructeur pour manipuler les roues et les pinces
      */
-    public Moteurs(Constantes roueDroite, Constantes roueGauche, Constantes pince, boolean estOuvert, float vP){
-    	this.roueDroite = new EV3LargeRegulatedMotor(roueDroite.port());
-    	this.roueGauche = new EV3LargeRegulatedMotor(roueGauche.port());
+    public Moteurs(boolean estOuvert, float vP){
+    	this.roueDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
+    	this.roueGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
     	this.vitesseDroit = maxVitesseDroit;
     	this.vitesseGauche = maxVitesseGauche;
     	this.roueDroite.setSpeed(vitesseDroit);
     	this.roueGauche.setSpeed(vitesseGauche);
-    	this.pince = new EV3LargeRegulatedMotor(pince.port());
+    	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
     	this.vitessePince = vP;
     	this.pince.setSpeed(vitessePince);
     	this.estOuvert = estOuvert;
@@ -173,10 +146,14 @@ public class Moteurs implements APIMoteurs {
 		if(correction)
 			i = i - (i * R2D2Constants.PR_ANGLE_CORRECTION);
 		if(left){
-			pilot.rotate(i*-1, true);
+			pilot.rotate(i*-1);
 		}else{
-			pilot.rotate(i, true);	
+			pilot.rotate(i);	
 		}
 	}
 
+	public void run(){
+		pilot.forward();
+	}
+	
 }

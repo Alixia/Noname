@@ -19,7 +19,7 @@ public class PinceTest {
 	}
 
 	public static void main(String[] args) {
-		Moteurs m = new Moteurs(Constantes.pince, true, 150);
+		Moteurs m = new Moteurs(true, 150);
         FermerPince(m);
         OuvrirPince(m);
 	}
