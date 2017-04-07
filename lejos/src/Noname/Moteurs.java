@@ -11,6 +11,8 @@ import lejos.utility.Delay;
 
 import org.r2d2.utils.R2D2Constants;
 
+import Noname.API.APIMoteurs;
+import Noname.Outils.Constantes;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 

@@ -1,4 +1,9 @@
-package Noname;
+package Noname.Test;
+
+import Noname.Capteurs;
+import Noname.Couleur;
+import Noname.Outils.InputHandler;
+import Noname.Outils.Screen;
 
 public class TestCouleurs {
 

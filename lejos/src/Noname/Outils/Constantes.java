@@ -1,4 +1,4 @@
-package Noname;
+package Noname.Outils;
 
 import org.r2d2.utils.R2D2Constants;
 

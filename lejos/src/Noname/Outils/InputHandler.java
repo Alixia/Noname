@@ -1,4 +1,4 @@
-package Noname;
+package Noname.Outils;
 
 import lejos.hardware.Button;
 

@@ -1,4 +1,4 @@
-package Noname;
+package Noname.API;
 
 public interface APIMoteurs {
 
