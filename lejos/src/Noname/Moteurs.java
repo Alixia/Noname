@@ -11,6 +11,8 @@ import lejos.utility.Delay;
 
 import org.r2d2.utils.R2D2Constants;
 
+import Noname.API.APIMoteurs;
+import Noname.Outils.Constantes;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
@@ -28,14 +30,13 @@ public class Moteurs implements APIMoteurs, MoveListener {
     private boolean avance;
     
     private EV3LargeRegulatedMotor pince;
-    private boolean estOuvert;
     private float vitessePince;
     
     
     /*
      * Constructeur pour manipuler les roues et les pinces
      */
-    public Moteurs(boolean estOuvert, float vP){
+    public Moteurs(float vP){
     	
     	this.rDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
     	this.rGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
@@ -55,7 +56,6 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
     	this.vitessePince = vP;
     	this.pince.setSpeed(vitessePince);
-    	this.estOuvert = estOuvert;
     }
     
 	public void setVitesse(float v) {
@@ -88,36 +88,14 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		}
 	}
 
-	@Override
-	public void fermer() {
-		if(estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionFermer();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}
-	}
-
-	@Override
-	public void ouvrir() {
-		if(!estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionOuvrir();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}		
+	public void ouvrir(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.forward();
 	}
 	
-	@Override
-	public void actionFermer() {
-		pince.backward();		
-	}
-
-	@Override
-	public void actionOuvrir() {
-		pince.forward();		
+	public void fermer(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.backward();
 	}
 
 	public boolean bouge(){
@@ -135,6 +113,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		// TODO Auto-generated method stub
 		avance = false;
 	}
+
 
 	
 }

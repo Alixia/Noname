@@ -1,12 +1,13 @@
-package Noname;
+package Noname.Test;
 
+import Noname.Moteurs;
 import lejos.utility.Delay;
 
 public class TestRoue {
 
 	public static void tournerEnCarreeG(){
 		
-		Moteurs m = new Moteurs(true, 50);
+		Moteurs m = new Moteurs(50);
 		for(int i = 0; i < 4; i++){
 			m.avancer();
 			Delay.msDelay(1000);

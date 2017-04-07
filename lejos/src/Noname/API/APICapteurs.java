@@ -1,4 +1,6 @@
-package Noname;
+package Noname.API;
+
+import Noname.Couleur;
 
 public interface APICapteurs {
 
