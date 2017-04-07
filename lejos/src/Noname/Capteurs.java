@@ -4,6 +4,7 @@ import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.robotics.Color;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.filter.MeanFilter;
 
@@ -71,6 +72,14 @@ public class Capteurs implements APICapteurs{
 		return Math.sqrt (Math.pow(v1[0] - v2[0], 2.0) +
 				Math.pow(v1[1] - v2[1], 2.0) +
 				Math.pow(v1[2] - v2[2], 2.0));
+	}
+	
+	public void lightOn(){
+		colorimetre.setFloodlight(Color.WHITE);
+	}
+	
+	public void lightOff(){
+		colorimetre.setFloodlight(false);
 	}
 	
 	public void setCalibration(float[][] couleurs){
