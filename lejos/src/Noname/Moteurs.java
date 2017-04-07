@@ -36,7 +36,7 @@ public class Moteurs implements APIMoteurs {
     /*
      * Constructeur pour manipuler les roues et les pinces
      */
-    public Moteurs(boolean estOuvert, float vP){
+    public Moteurs(float vP){
     	this.roueDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
     	this.roueGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
     	this.vitesseDroit = maxVitesseDroit;
@@ -46,7 +46,6 @@ public class Moteurs implements APIMoteurs {
     	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
     	this.vitessePince = vP;
     	this.pince.setSpeed(vitessePince);
-    	this.estOuvert = estOuvert;
     }
     
 	@Override
@@ -105,37 +104,16 @@ public class Moteurs implements APIMoteurs {
 		
 	}
 
-	@Override
-	public void fermer() {
-		if(estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionFermer();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}
-	}
-
-	@Override
-	public void ouvrir() {
-		if(!estOuvert){
-			 for (int i = 0; i < 5; i++){
-				 	actionOuvrir();
-		            Delay.msDelay(1000);
-		     }
-			 estOuvert = !estOuvert;
-		}		
+	public void ouvrir(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.forward();
 	}
 	
-	@Override
-	public void actionFermer() {
-		pince.backward();		
+	public void fermer(int nbIterations) {
+		for (int i = 0; i < nbIterations; i++)
+			pince.backward();
 	}
 
-	@Override
-	public void actionOuvrir() {
-		pince.forward();		
-	}
 	
 	public void rotate(int i, boolean left, double speed) {
 		pilot.setAngularSpeed(speed);

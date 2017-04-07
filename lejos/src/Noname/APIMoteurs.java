@@ -16,8 +16,8 @@ public interface APIMoteurs {
 	public void tournerGauche();
 
 	// Methodes pour la pince
-	public void fermer();
-	public void ouvrir();	
+	public void fermer(int nbIterations);
+	public void ouvrir(int nbIterations);	
 	public void actionFermer();
 	public void actionOuvrir();
 	
