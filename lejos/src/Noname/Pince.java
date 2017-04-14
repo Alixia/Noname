@@ -18,20 +18,25 @@ public class Pince {
 		
 		// Constructeur par defaut
 		public Pince(){
-			 this.vitessePince = 150;
-			 this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
-		     this.pince.setSpeed(this.vitessePince);
-			 nbIterations = 0;
-			 calibration();
+			initialisation();
+			this.vitessePince = 150;
+			this.pince.setSpeed(this.vitessePince);
 		}
 		
 		// Constructeur avec prise en compte de vitesse de la pince vP
 		public Pince(int vP){
+			 initialisation();
 			 this.vitessePince = vP;
-			 this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
-		     this.pince.setSpeed(this.vitessePince);
-			 nbIterations = 0;
-			 calibration();
+			 this.pince.setSpeed(this.vitessePince);
+		}
+		
+		// Initialisation et lancement de la calibration
+		public void initialisation(){
+			this.vitessePince = 150; // Vitesse agreable pour la calibration
+			this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
+			this.pince.setSpeed(this.vitessePince);
+			nbIterations = 0;
+			calibration();
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince
@@ -59,15 +64,21 @@ public class Pince {
 		
 		// Ouverture de la pince
 		public void ouvrirPince(){
-			if(!isOpen) // Uniquement si elle est fermee
-				for(int i=0;i<nbIterations;i++)
+			if(!isOpen){ // Uniquement si elle est fermee
+				for(int i=0;i<nbIterations;i++){
 					pince.forward();
+				}
+			}
+			isOpen = true;
 		}
 		
 		// Fermeture de la pince 
 		public void fermerPince(){
-			if(isOpen) // Uniquement si elle est ouverte
-				for(int i=0;i<nbIterations;i++)
+			if(isOpen){ // Uniquement si elle est ouverte
+				for(int i=0;i<nbIterations;i++){
 					pince.backward();
+				}
+			}
+			isOpen = false;
 		}
 }
