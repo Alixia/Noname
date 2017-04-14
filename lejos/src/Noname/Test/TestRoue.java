@@ -1,6 +1,8 @@
 package Noname.Test;
 
-import Noname.Moteurs;
+import java.awt.Point;
+
+import Noname.*;
 import lejos.utility.Delay;
 
 public class TestRoue {
@@ -15,10 +17,18 @@ public class TestRoue {
 		}
         
 	}
+	
+	public static void testPalet(){
+		Moteurs m = new Moteurs();
+		Pince p = new Pince();
+		Capteurs c = new Capteurs();
+		Strategie s = new Strategie(c, m, p);
+		s.AvancerVersPalet(new Point(0,0), new Point(5,5));
+	}
 
 	public static void main(String[] args) {
-		tournerEnCarreeG();
-		
+		//tournerEnCarreeG();
+		testPalet();
 	}
 
 }
