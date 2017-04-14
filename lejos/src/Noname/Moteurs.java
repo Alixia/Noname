@@ -9,6 +9,8 @@ import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.utility.Delay;
 
+import java.awt.Point;
+
 import org.r2d2.utils.R2D2Constants;
 
 import Noname.API.APIMoteurs;
@@ -30,7 +32,8 @@ public class Moteurs implements APIMoteurs, MoveListener {
     private float vitesseRoues;
     private boolean avance;
     
-    private float angle;
+    private double angle;
+    private Point position;
     
     /*
      * Constructeur pour manipuler les roues et les pinces
@@ -52,6 +55,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pilot.setAngularSpeed(maxVitesseRoue);
 		pilot.addMoveListener(this);
 		
+		this.position = new Point();
 		this.angle = 0;
     }
     
@@ -62,6 +66,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		System.out.println("Appuyez sur le bouton quand le robot est à la position de base");
 		Button.ENTER.waitForPressAndRelease();
 		this.angle = 0;
+		position = new Point(0, 0);
     }
     
 	public void setVitesse(float v) {
@@ -85,7 +90,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		pilot.stop();
 	}
 	
-	public void tourner(float i, boolean aGauche, double vitesse) {
+	public void tourner(double i, boolean aGauche, double vitesse) {
 		pilot.setAngularSpeed(vitesse);
 		if(aGauche){
 			pilot.rotate(i*-1);
@@ -95,6 +100,10 @@ public class Moteurs implements APIMoteurs, MoveListener {
 			this.angle = angle + i ;
 		}
 	}
+	
+	public void demiTour(){
+		tourner(180, true, 120);
+	}
 
 	public boolean bouge(){
 		return avance;
@@ -102,8 +111,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 	
 	@Override
 	public void moveStarted(Move event, MoveProvider mp) {
-		avance = true;
-		
+		avance = true;	
 	}
 
 	@Override
@@ -112,12 +120,12 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		avance = false;
 	}
 
-	public float angle(){
+	public double angle(){
 		return angle;
 	}
 	
-	public void revenirDroit(float vitesse){
-		tourner(angle, true, vitesse);
+	public void revenirAngleInitial(boolean face, float vitesse){
+		tourner(angle, face, vitesse);
 	}
 
 	

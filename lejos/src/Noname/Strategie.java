@@ -20,8 +20,25 @@ public class Strategie {
 		moteurs.calibration();
 	}
 	
-	public void recupererPalet(Point position){
-		moteurs.revenirDroit(200);
+	//position du robot a calculer!!!!
+	public void recupererPalet(Point positionRobot, Point positionPalet){
+		if(positionPalet.x == positionRobot.x){
+			if(positionPalet.y > positionRobot.y){
+				if(moteurs.angle() >= 85 && moteurs.angle() <= 95){
+					moteurs.demiTour();
+				}
+			}
+		}else{
+			if(positionPalet.x < positionRobot.x){
+				moteurs.revenirAngleInitial(false, 200);
+			}else{
+				moteurs.revenirAngleInitial(true, 200);
+			}
+			double tangenteTeta = Math.abs(positionPalet.y - positionRobot.y)/Math.abs(positionPalet.x-positionRobot.x);
+			double teta = Math.atan(tangenteTeta);
+			moteurs.tourner(Math.toDegrees(teta), false, 120);
+		}
+		moteurs.avancer();
 	}
 	
 }
