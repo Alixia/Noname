@@ -22,7 +22,7 @@ public class Pince {
 			 this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
 		     this.pince.setSpeed(this.vitessePince);
 			 nbIterations = 0;
-			 Calibration();
+			 calibration();
 		}
 		
 		// Constructeur avec prise en compte de vitesse de la pince vP
@@ -31,11 +31,11 @@ public class Pince {
 			 this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
 		     this.pince.setSpeed(this.vitessePince);
 			 nbIterations = 0;
-			 Calibration();
+			 calibration();
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince
-		public void Calibration(){
+		public void calibration(){
 			InputHandler ih = new InputHandler(new Screen());
 			
 			// Message de prevention
@@ -58,14 +58,14 @@ public class Pince {
 		}
 		
 		// Ouverture de la pince
-		public void OuvrirPince(){
+		public void ouvrirPince(){
 			if(!isOpen) // Uniquement si elle est fermee
 				for(int i=0;i<nbIterations;i++)
 					pince.forward();
 		}
 		
 		// Fermeture de la pince 
-		public void FermerPince(){
+		public void fermerPince(){
 			if(isOpen) // Uniquement si elle est ouverte
 				for(int i=0;i<nbIterations;i++)
 					pince.backward();
