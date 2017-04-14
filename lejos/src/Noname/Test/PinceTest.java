@@ -6,7 +6,7 @@ public class PinceTest {
 
 	public static void main(String[] args) {
 		Pince P = new Pince();
-        P.calibration();
+        P.Calibration();
 	}
 
 }

@@ -6,6 +6,7 @@ import org.r2d2.vue.Screen;
 
 import Noname.Outils.Constantes;
 import lejos.hardware.Button;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
 public class Pince {
