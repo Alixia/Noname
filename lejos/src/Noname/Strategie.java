@@ -14,14 +14,13 @@ public class Strategie {
 		this.pince = p;
 	}
 	
-	public void intialisaton(){
+	public void intialisation(){
 		pince.calibration();
 		//capteur.calibration();
 		moteurs.calibration();
 	}
 	
-	//position du robot a calculer!!!!
-	public void avancerVersPalet(Point positionRobot, Point positionPalet){
+	public void dirigerVersPalet(Point positionRobot, Point positionPalet){
 		moteurs.arreter();
 		if(positionPalet.x == positionRobot.x){
 			if(positionPalet.y > positionRobot.y){
@@ -39,7 +38,6 @@ public class Strategie {
 			double teta = Math.atan(tangenteTeta);
 			moteurs.tourner(Math.toDegrees(teta), false, 120);
 		}
-		moteurs.avancer();
 	}
 	
 }

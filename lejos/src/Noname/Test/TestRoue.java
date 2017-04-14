@@ -23,7 +23,10 @@ public class TestRoue {
 		Pince p = new Pince();
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		s.avancerVersPalet(new Point(0,0), new Point(5,5));
+		s.dirigerVersPalet(new Point(0,0), new Point(5,5));
+		s.dirigerVersPalet(new Point(0,0), new Point(-5,5));
+		s.dirigerVersPalet(new Point(0,0), new Point(5,-5));
+		s.dirigerVersPalet(new Point(0,0), new Point(-5,-5));
 	}
 
 	public static void main(String[] args) {
