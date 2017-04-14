@@ -1,6 +1,6 @@
 package Noname.API;
 
-import Noname.Couleur;
+import Noname.Outils.Couleur;
 
 public interface APICapteurs {
 

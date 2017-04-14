@@ -1,7 +1,7 @@
 package Noname.Test;
 
 import Noname.Capteurs;
-import Noname.Couleur;
+import Noname.Outils.Couleur;
 import Noname.Outils.InputHandler;
 import Noname.Outils.Screen;
 

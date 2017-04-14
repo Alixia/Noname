@@ -2,6 +2,7 @@ package Noname;
 
 import Noname.API.APICapteurs;
 import Noname.Outils.Constantes;
+import Noname.Outils.Couleur;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
