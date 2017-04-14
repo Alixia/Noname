@@ -21,7 +21,8 @@ public class Strategie {
 	}
 	
 	//position du robot a calculer!!!!
-	public void recupererPalet(Point positionRobot, Point positionPalet){
+	public void avancerVersPalet(Point positionRobot, Point positionPalet){
+		moteurs.arreter();
 		if(positionPalet.x == positionRobot.x){
 			if(positionPalet.y > positionRobot.y){
 				if(moteurs.angle() >= 85 && moteurs.angle() <= 95){

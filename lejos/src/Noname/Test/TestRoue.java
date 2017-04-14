@@ -23,7 +23,7 @@ public class TestRoue {
 		Pince p = new Pince();
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		s.AvancerVersPalet(new Point(0,0), new Point(5,5));
+		s.avancerVersPalet(new Point(0,0), new Point(5,5));
 	}
 
 	public static void main(String[] args) {
