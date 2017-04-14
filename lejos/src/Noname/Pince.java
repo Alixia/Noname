@@ -18,33 +18,29 @@ public class Pince {
 		
 		// Constructeur par defaut
 		public Pince(){
-			initialisation();
 			this.vitessePince = 150;
-			this.pince.setSpeed(this.vitessePince);
+			initialisation();
 		}
 		
 		// Constructeur avec prise en compte de vitesse de la pince vP
 		public Pince(int vP){
-			 initialisation();
 			 this.vitessePince = vP;
-			 this.pince.setSpeed(this.vitessePince);
+			 initialisation();
 		}
 		
 		// Initialisation et lancement de la calibration
 		public void initialisation(){
-			this.vitessePince = 150; // Vitesse agreable pour la calibration
 			this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
 			this.pince.setSpeed(this.vitessePince);
 			nbIterations = 0;
-			//calibration();
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince
 		public void calibration(){
-			
-			nbIterations = 0;
-			
 			InputHandler ih = new InputHandler(new Screen());
+			
+			this.pince.setSpeed(150); // Vitesse agreable pour la calibration
+			nbIterations = 0; // Nombre de pas qu'il faut pour ouvrir/fermer
 			
 			// Message de prevention
 			System.out.println("Calibration de la pince");
@@ -53,10 +49,11 @@ public class Pince {
 			
 			// Fermeture de la pince
 			System.out.println("Appuyez sur OK lorsque la pince est fermee sur un palet");
-			while(!ih.enterPressed()) // Tant que l'user n'appuie pas sur OK
+			while(!ih.enterPressed()){ // Tant que l'user n'appuie pas sur OK
 				pince.backward(); // Fermer la pince d'un pas
-			Delay.msDelay(200); // Attente du realease du bouton 
+			}
 			pince.stop();
+			Delay.msDelay(200); // Attente du realease du bouton 
 
 			System.out.println("Appuyez sur OK lorsque la pince est ouverte");
 			while(!ih.enterPressed()){ // Tant que l'user n'appuie pas sur OK
@@ -64,9 +61,14 @@ public class Pince {
 				nbIterations++;
 			}
 			pince.stop();
+			Delay.msDelay(200); // Attente du realease du bouton 
 
 			isOpen = true; // La pince est ouverte a la fin de la calibration
 			
+			// PHASE DE TESTS
+			nbIterations += (nbIterations/10);
+			
+			this.pince.setSpeed(this.vitessePince); // Retablissement de la vitesse voulue
 		}
 		
 		// Ouverture de la pince
