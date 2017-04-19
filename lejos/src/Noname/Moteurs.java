@@ -90,6 +90,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		pilot.stop();
 	}
 	
+	//angle compris entre 0 et 360
 	public void tourner(double i, boolean aGauche, double vitesse) {
 		pilot.setAngularSpeed(vitesse);
 		if(aGauche){
@@ -97,7 +98,13 @@ public class Moteurs implements APIMoteurs, MoveListener {
 			this.angle = angle - i ;
 		}else{
 			pilot.rotate(i);
-			this.angle = angle + i ;
+			this.angle = angle + i;
+		}
+		if(angle >= 360){
+			this.angle -= 360;
+		}
+		if(angle < 0){
+			this.angle += 360;
 		}
 	}
 	
