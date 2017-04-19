@@ -11,8 +11,8 @@ public class TestCouleurs {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Capteurs capteurs = new Capteurs();
-		//Screen screen = new Screen();
-		//InputHandler input = new InputHandler(screen);
+		Screen screen = new Screen();
+		InputHandler input = new InputHandler(screen);
 
 		capteurs.calibration();
 		/*for (Couleur c : Couleur.values()) {
@@ -23,6 +23,11 @@ public class TestCouleurs {
 		}*/
 		// the end
 
+		System.out.println("appuyez sur un bouton pour tester la couleur");
+		while(true){
+			input.waitAny();
+			System.out.println(capteurs.getCurrentColor().name());
+		}
 	}
 
 /*	private static String tableauString(float[][] tab) {

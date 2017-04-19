@@ -56,21 +56,19 @@ public class Capteurs implements APICapteurs{
 		couleurs[couleur.ordinal()] = new float[moyenne.sampleSize()];
 		moyenne.fetchSample(couleurs[couleur.ordinal()], 0);
 	}
-	public int getCurrentColor(){
+	public Couleur getCurrentColor(){
 		SampleProvider moyenne = new MeanFilter(colorimetre.getRGBMode(), 1);
 		float[]        echantillon  = new float[moyenne.sampleSize()];
 		double         distance = Double.MAX_VALUE;
-		int            couleur   = -1;
+		Couleur        couleur   = Couleur.rouge;
 
 		moyenne.fetchSample(echantillon, 0);
 
-		for(int i= 0; i< 16; i++){
-			if(couleurs[i].length > 0){
-				double scalaire = scalaire(echantillon, couleurs[i]);
+		for(Couleur c : Couleur.values()){
+				double scalaire = scalaire(echantillon, couleurs[c.ordinal()]);
 				if (scalaire < distance) {
 					distance = scalaire;
-					couleur = i;
-				}
+					couleur = c;
 			}
 		}
 		return couleur;
