@@ -22,13 +22,14 @@ public class Strategie {
 	
 	public void dirigerVersPalet(Point positionRobot, Point positionPalet){
 		moteurs.arreter();
-//		if(positionPalet.y == positionRobot.y){
-//			if(positionPalet.x > positionRobot.x){
-//				if(moteurs.angle() >= 85 && moteurs.angle() <= 95){
-//					moteurs.demiTour();
-//				}
-//			}
-//		}else{
+		if(positionPalet.y == positionRobot.y){
+			moteurs.revenirAngleInitial(true, 120);
+			if(positionRobot.x < positionPalet.x){
+				moteurs.tourner(90, false, 120);
+			}else{
+				moteurs.tourner(-90, false, 120);
+			}
+		}else{
 			boolean face;
 			if(positionRobot.y < positionPalet.y){
 				moteurs.revenirAngleInitial(true, 200);
@@ -54,7 +55,7 @@ public class Strategie {
 					moteurs.tourner(1*Math.toDegrees(teta), false, 120);
 				}
 			}
-		//}
+		}
 	}
 	
 }
