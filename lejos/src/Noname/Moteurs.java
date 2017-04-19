@@ -124,8 +124,18 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		return angle;
 	}
 	
+	public void setangle(double angle){
+		this.angle = angle;
+	}
+	
+	
 	public void revenirAngleInitial(boolean face, float vitesse){
-		tourner(angle, face, vitesse);
+		if(face){
+			tourner(-angle, false, vitesse);
+		}else{
+			tourner(180-angle, false, vitesse);
+		}
+		
 	}
 
 	

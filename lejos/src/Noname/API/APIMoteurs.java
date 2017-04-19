@@ -26,6 +26,6 @@ public interface APIMoteurs {
 	 * @param aGauche true si on veut tourner à gauche
 	 * @param vitesse vitesse angulaire
 	 */
-	public void tourner(float degres, boolean aGauche, double vitesse);
+	public void tourner(double degres, boolean aGauche, double vitesse);
 
 }
