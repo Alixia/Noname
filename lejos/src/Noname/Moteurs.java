@@ -9,10 +9,13 @@ import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.utility.Delay;
 
+import java.awt.Point;
+
 import org.r2d2.utils.R2D2Constants;
 
 import Noname.API.APIMoteurs;
 import Noname.Outils.Constantes;
+import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
@@ -29,14 +32,13 @@ public class Moteurs implements APIMoteurs, MoveListener {
     private float vitesseRoues;
     private boolean avance;
     
-    private EV3LargeRegulatedMotor pince;
-    private float vitessePince;
-    
+    private double angle;
+    private Point position;
     
     /*
      * Constructeur pour manipuler les roues et les pinces
      */
-    public Moteurs(float vP){
+    public Moteurs(){
     	
     	this.rDroite = new EV3LargeRegulatedMotor(Constantes.roueDroite.port());
     	this.rGauche = new EV3LargeRegulatedMotor(Constantes.roueGauche.port());
@@ -52,10 +54,19 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pilot.setLinearSpeed(maxVitesseRoue);
     	this.pilot.setAngularSpeed(maxVitesseRoue);
 		pilot.addMoveListener(this);
+		
+		this.position = new Point();
+		this.angle = 0;
+    }
     
-    	this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
-    	this.vitessePince = vP;
-    	this.pince.setSpeed(vitessePince);
+    public void calibration(){
+    	System.out.println("Calibration de l'angle du robot");
+		Button.ENTER.waitForPressAndRelease();
+		Delay.msDelay(200); // Attente du realease du bouton
+		System.out.println("Appuyez sur le bouton quand le robot est à la position de base");
+		Button.ENTER.waitForPressAndRelease();
+		this.angle = 0;
+		position = new Point(0, 0);
     }
     
 	public void setVitesse(float v) {
@@ -79,33 +90,35 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		pilot.stop();
 	}
 	
-	public void tourner(float i, boolean aGauche, double vitesse) {
+	//angle compris entre 0 et 360
+	public void tourner(double i, boolean aGauche, double vitesse) {
 		pilot.setAngularSpeed(vitesse);
 		if(aGauche){
 			pilot.rotate(i*-1);
+			this.angle = angle - i ;
 		}else{
-			pilot.rotate(i);	
+			pilot.rotate(i);
+			this.angle = angle + i;
+		}
+		if(angle >= 360){
+			this.angle -= 360;
+		}
+		if(angle < 0){
+			this.angle += 360;
 		}
 	}
-
-	public void ouvrir(int nbIterations) {
-		for (int i = 0; i < nbIterations; i++)
-			pince.forward();
-	}
 	
-	public void fermer(int nbIterations) {
-		for (int i = 0; i < nbIterations; i++)
-			pince.backward();
+	public void demiTour(){
+		tourner(180, true, 120);
 	}
 
 	public boolean bouge(){
-		return true;
+		return avance;
 	}
 	
 	@Override
 	public void moveStarted(Move event, MoveProvider mp) {
-		avance = true;
-		
+		avance = true;	
 	}
 
 	@Override
@@ -114,6 +127,27 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		avance = false;
 	}
 
+	public double angle(){
+		return angle;
+	}
+	
+	public void setangle(double angle){
+		this.angle = angle;
+	}
+	
+	
+	public void revenirAngleInitial(boolean face, float vitesse){
+		if(face){
+			if(angle > 180){
+				tourner(360-angle, false, vitesse);
+			}else{
+				tourner(-angle, false, vitesse);
+			}
+		}else{
+			tourner(180-angle, false, vitesse);
+		}
+		
+	}
 
 	
 }
