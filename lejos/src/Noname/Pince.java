@@ -41,7 +41,7 @@ public class Pince {
 			// Message de prevention
 			System.out.println("Calibration de la pince");
 			Button.ENTER.waitForPressAndRelease();
-			Delay.msDelay(200); // Attente du release du bouton 
+			Delay.msDelay(200); // Attente du realease du bouton 
 			
 			// Fermeture de la pince
 			System.out.println("Appuyez sur OK lorsque la pince est fermee sur un palet");
