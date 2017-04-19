@@ -22,22 +22,39 @@ public class Strategie {
 	
 	public void dirigerVersPalet(Point positionRobot, Point positionPalet){
 		moteurs.arreter();
-		if(positionPalet.x == positionRobot.x){
-			if(positionPalet.y > positionRobot.y){
-				if(moteurs.angle() >= 85 && moteurs.angle() <= 95){
-					moteurs.demiTour();
+//		if(positionPalet.y == positionRobot.y){
+//			if(positionPalet.x > positionRobot.x){
+//				if(moteurs.angle() >= 85 && moteurs.angle() <= 95){
+//					moteurs.demiTour();
+//				}
+//			}
+//		}else{
+			boolean face;
+			if(positionRobot.y < positionPalet.y){
+				moteurs.revenirAngleInitial(true, 200);
+				face = true;
+			}else{
+				moteurs.revenirAngleInitial(false, 200);
+				face = false;
+			}
+			double tangenteTeta = Math.abs(positionPalet.x - positionRobot.x)/Math.abs(positionPalet.y-positionRobot.y);
+			double teta = Math.atan(tangenteTeta);
+			
+			if(positionRobot.x < positionPalet.x){
+				if(face){
+					moteurs.tourner(1*Math.toDegrees(teta), false, 120);
+				}else{
+					moteurs.tourner(-1*Math.toDegrees(teta), false, 120);
+				}
+				
+			}else{
+				if(face){
+					moteurs.tourner(-1*Math.toDegrees(teta), false, 120);
+				}else{
+					moteurs.tourner(1*Math.toDegrees(teta), false, 120);
 				}
 			}
-		}else{
-			if(positionPalet.x < positionRobot.x){
-				moteurs.revenirAngleInitial(false, 200);
-			}else{
-				moteurs.revenirAngleInitial(true, 200);
-			}
-			double tangenteTeta = Math.abs(positionPalet.y - positionRobot.y)/Math.abs(positionPalet.x-positionRobot.x);
-			double teta = Math.atan(tangenteTeta);
-			moteurs.tourner(Math.toDegrees(teta), false, 120);
-		}
+		//}
 	}
 	
 }
