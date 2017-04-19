@@ -1,8 +1,12 @@
 package Noname;
 
+import org.r2d2.vue.InputHandler;
+import org.r2d2.vue.Screen;
+
 import Noname.API.APICapteurs;
 import Noname.Outils.Constantes;
 import Noname.Outils.Couleur;
+import lejos.hardware.Button;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
@@ -91,5 +95,16 @@ public class Capteurs implements APICapteurs{
 	
 	public float[][] getCalibration() {
 		return couleurs;
+	}
+	public void calibration(){
+		InputHandler ih = new InputHandler(new Screen());
+		System.out.println("début de la calibration des couleurs");
+		for(Couleur c : Couleur.values()){
+			System.out.println("calbirer " + c.name());
+			System.out.println("appuyez sur Entrer pour valider");
+			ih.waitAny();
+			calibrerCouleur(c);
+		}
+		System.out.println("calibration terminée");
 	}
 }
