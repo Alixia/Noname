@@ -2,16 +2,21 @@ package Noname;
 
 import java.awt.Point;
 
+import Noname.Outils.MachineEtat;
+
 public class Strategie {
 
 	private Capteurs capteur;
 	private Moteurs moteurs;
 	private Pince pince;
-
+	
+	private MachineEtat etat;
+	
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
 		this.capteur = ca;
 		this.moteurs = m;
 		this.pince = p;
+		etat = MachineEtat.NOPALLET;
 	}
 
 	public void intialisation() {
@@ -58,12 +63,17 @@ public class Strategie {
 			}
 		}
 	}
+	
+	public Point detecterPlusProchePallet(){
+		
+		return null;
+	}
 
 	public void run() {
 		Point pallet;
-		while (true) {
-			/*switch (etat) {
-			case INIT:
+		/*while (true) {
+			switch (etat) {
+			case NOPALLET:
 				pallet = detecterPlusProchePallet();
 				if (allerChercherPallet(pallet)) {
 					etat = PALLET;
@@ -73,8 +83,8 @@ public class Strategie {
 			break;
 			case PALLET:
 				rentrerALaMaison();
-			}*/
-		}
+			}
+		}*/
 	}
 
 }
