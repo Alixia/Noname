@@ -45,11 +45,6 @@ public class Capteurs implements APICapteurs{
 		return echantillon[0];
 	}
 
-	@Override
-	public Couleur couleur() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	public void calibrerCouleur(Couleur couleur){
 		SampleProvider moyenne = new MeanFilter(colorimetre.getRGBMode(), 1);

@@ -14,9 +14,5 @@ public interface APICapteurs {
 	 */
 	public float distanceVision();
 	
-	/*
-	 * colorimetre
-	 */
-	public Couleur couleur();
 	
 }

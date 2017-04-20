@@ -6,6 +6,7 @@ import Noname.Capteurs;
 import Noname.Moteurs;
 import Noname.Pince;
 import Noname.Strategie;
+import Noname.Outils.Couleur;
 import lejos.utility.Delay;
 
 public class TestStrategie {
@@ -54,13 +55,25 @@ public class TestStrategie {
 		s.dirigerVersPalet(dest, init);
 	}
 	
+	public static void avanceJusqueLigneBlanche(Moteurs m, Pince p, Capteurs c, Strategie s){
+		c.calibration();
+		
+		m.avancer();
+
+		while(!c.getCurrentColor().equals(Couleur.blanc)){
+			Delay.msDelay(20);
+		}
+		m.arreter();
+	}
+	
 	public static void main(String[] args) {
 
 		Moteurs m = new Moteurs();
 		Pince p = new Pince(500);
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		getPalet(m,p,c,s);
+		//getPalet(m,p,c,s);
 		//tourSensHoraire(s);
+		avanceJusqueLigneBlanche(m,p,c,s);
 	}
 }
