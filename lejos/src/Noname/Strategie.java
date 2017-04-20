@@ -72,31 +72,48 @@ public class Strategie {
 	
 	public Point detecterPlusProchePallet(){
 		int indicePalletPlusProche = 0;
+		double distancePrec = 5000;
 		for(int i = 0; i < tabPallet.length; i++){
-			double distance = tabPallet[i][x]-tabRobot[indiceRobot][x];
-			/*if( ){
-				
-			}*/
+			if((tabPallet[i][y]>50) && (tabPallet[i][y]<250)){
+				double distanceEnCours =  Math.sqrt(Math.pow(tabPallet[i][x]-tabRobot[indiceRobot][x], 2) + Math.pow(tabPallet[i][y]-tabRobot[indiceRobot][y], 2));
+				if( distancePrec > distanceEnCours ){
+					indicePalletPlusProche = i;
+					distancePrec = distanceEnCours;
+				}
+			}
 		}
-		return null;
+		Point plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
+		return plusProche;
 	}
+	
+	private void rentrerALaMaison() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private boolean allerChercherPallet(Point pallet) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 	public void run() {
 		Point pallet;
-		/*while (true) {
+		while (true) {
 			switch (etat) {
 			case NOPALLET:
 				pallet = detecterPlusProchePallet();
 				if (allerChercherPallet(pallet)) {
-					etat = PALLET;
+					etat = MachineEtat.PALLET;
 				} else {
 					
 				}
 			break;
 			case PALLET:
 				rentrerALaMaison();
+				etat = MachineEtat.NOPALLET;
 			}
-		}*/
+		}
 	}
 
 }
