@@ -50,4 +50,35 @@ public class InputHandler {
 	public boolean enterPressed() {
 		return Button.ENTER.isDown();
 	}
+	/**
+	 * Renvoie vrai si le bouton haut est enfoncé
+	 * @return
+	 */
+	public boolean upPressed() {
+		return Button.UP.isDown();
+	}
+
+	/**
+	 * 
+	 * @return vrai si le bouton bas est enfoncé
+	 */
+	public boolean downPressed() {
+		return Button.DOWN.isDown();
+	}
+	
+	/**
+	 * 
+	 * @return vrai si le bouton gauche est enfoncé
+	 */
+	public boolean leftPressed() {
+		return Button.LEFT.isDown();
+	}
+	
+	/**
+	 * 
+	 * @return vrai si le bouton droit est enfoncé
+	 */
+	public boolean rightPressed() {
+		return Button.RIGHT.isDown();
+	}
 }
