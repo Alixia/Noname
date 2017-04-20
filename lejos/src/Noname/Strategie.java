@@ -11,8 +11,11 @@ public class Strategie {
 	private Pince pince;
 	
 	private MachineEtat etat;
-	private int[][][] tabPallet;
-	private int[][][] tabRobot;
+	private int[][] tabPallet;
+	private int[][] tabRobot;
+	private int indiceRobot;
+	private int x = 1;
+	private int y = 2;
 	
 	
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
@@ -69,11 +72,12 @@ public class Strategie {
 	
 	public Point detecterPlusProchePallet(){
 		int indicePalletPlusProche = 0;
-		/*for(int i = 0; i < tabPallet.length; i++){
-			if(tabPallet[i][1]){
+		for(int i = 0; i < tabPallet.length; i++){
+			double distance = tabPallet[i][x]-tabRobot[indiceRobot][x];
+			/*if( ){
 				
-			}
-		}*/
+			}*/
+		}
 		return null;
 	}
 
