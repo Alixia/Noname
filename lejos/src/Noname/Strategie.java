@@ -147,9 +147,7 @@ public class Strategie {
 				pallet = detecterPlusProchePallet();
 				if (allerChercherPallet(pallet)) {
 					etat = MachineEtat.PALLET;
-				} else {
-					
-				}
+				} 
 			break;
 			case PALLET:
 				rentrerALaMaison();
