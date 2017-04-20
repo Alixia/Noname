@@ -59,6 +59,7 @@ public class Pince {
 			
 			isOpen = false; // Ouverture a la fin de la calibration
 			this.pince.setSpeed(vitessePince);
+			ouvrirPince();
 		}
 		
 		// Ouverture de la pince
