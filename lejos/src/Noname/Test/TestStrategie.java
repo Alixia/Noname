@@ -28,7 +28,7 @@ public class TestStrategie {
 		for(int i = 0; i < tabOrientation.length; i++){
 			System.out.println(tabOrientation[i].toString());
 			Delay.msDelay(1000);
-			s.dirigerVersPalet(new Point(0,0), tabOrientation[i]);
+			s.seDirigerVers(new Point(0,0), tabOrientation[i]);
 		}
 	}
 	
@@ -37,7 +37,7 @@ public class TestStrategie {
 		for(int i = tabOrientation.length-1; i >=0; i--){
 			System.out.println(tabOrientation[i].toString());
 			Delay.msDelay(1000);
-			s.dirigerVersPalet(init, tabOrientation[i]);
+			s.seDirigerVers(init, tabOrientation[i]);
 		}
 		
 	}
@@ -45,14 +45,14 @@ public class TestStrategie {
 	public static void getPalet(Moteurs m, Pince p, Capteurs c, Strategie s){
 		//c.calibration();
 		Point dest =  new Point(-2,3);
-		s.dirigerVersPalet(init, dest);
+		s.seDirigerVers(init, dest);
 		m.avancer();
 
 		while(!c.boutonEstPresse()){
 			Delay.msDelay(1000);
 		}
 		m.arreter();
-		s.dirigerVersPalet(dest, init);
+		s.seDirigerVers(dest, init);
 	}
 	
 	public static void avanceJusqueLigneBlanche(Moteurs m, Pince p, Capteurs c, Strategie s){
