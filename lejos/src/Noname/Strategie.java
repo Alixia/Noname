@@ -1,6 +1,8 @@
 package Noname;
 
 import java.awt.Point;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import Noname.Outils.Couleur;
 import Noname.Outils.MachineEtat;
@@ -31,8 +33,21 @@ public class Strategie {
 
 	public void intialisation() {
 		pince.calibration();
-		// capteur.calibration();
+		
+		try {
+			capteur.chargerCalibration();
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
 		moteurs.calibration();
+		// tests quand t'etais pas la
+		indiceRobot = 0;
+		indiceAdverse = 1;
+		tabRobot = new int[2][3];
+		tabRobot[indiceRobot][x] = 100;
+		tabRobot[indiceRobot][y] = 50;
+		tabRobot[indiceAdverse][x] = 100;
+		tabRobot[indiceAdverse][y] = 250;
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
@@ -96,34 +111,36 @@ public class Strategie {
 	}
 
 
-	private boolean allerChercherPallet(Point pallet) {
+	public boolean allerChercherPallet(Point pallet) {
 		//avance jusqu'au pallet et le prend en pince
 		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), pallet);
 		moteurs.avancer();
 		
 		//prendre en compte les erreurs potentielles du aux angles
 		//prendre en compte les obstacle
-		while(!capteur.boutonEstPresse() && !pointsEgaux(new Point(tabRobot[indiceAdverse][x],  tabRobot[indiceAdverse][y]), pallet)){
+		while(!capteur.boutonEstPresse() /*&& !pointsEgaux(new Point(tabRobot[indiceAdverse][x],  tabRobot[indiceAdverse][y]), pallet)*/){
 			Delay.msDelay(200);
 			mettreAJourTab();
 		}
+		
 		if(capteur.boutonEstPresse()){
+			moteurs.arreter();
 			pince.fermerPince();
 			return true;
 		}
-		
+		moteurs.arreter();
 		return false;
 	}
 
 
 	//met a jour les tableau palet et robot
-	private void mettreAJourTab() {
+	public void mettreAJourTab() {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	private void rentrerALaMaison() {
-		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), new Point(50, 100));
+	public void rentrerALaMaison() {
+		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), new Point(100, 50));
 		moteurs.avancer();
 		
 		//prendre en compte les erreurs potentielles du aux angles
@@ -131,9 +148,12 @@ public class Strategie {
 		while(!capteur.getCurrentColor().equals(Couleur.blanc)){
 			Delay.msDelay(200);
 		}
+		moteurs.arreter();
 		pince.ouvrirPince();
 		moteurs.reculer();
 		Delay.msDelay(200);
+		moteurs.arreter();
+
 		mettreAJourTab();
 	
 	}

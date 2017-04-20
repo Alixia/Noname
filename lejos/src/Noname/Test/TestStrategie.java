@@ -11,17 +11,17 @@ import lejos.utility.Delay;
 
 public class TestStrategie {
 	
-	public static Point E = new Point(5,0);
-	public static Point NE = new Point(5,5);
-	public static Point N = new Point(0,5);
-	public static Point NO = new Point(-5,5);
-	public static Point O = new Point(-5,0);
-	public static Point SO = new Point(-5,-5);
-	public static Point S = new Point(0,-5);
-	public static Point SE = new Point(5,-5);
-	public static Point init = new Point(0,0);
+	final private static Point E = new Point(5,0);
+	final private static Point NE = new Point(5,5);
+	final private static Point N = new Point(0,5);
+	final private static Point NO = new Point(-5,5);
+	final private static Point O = new Point(-5,0);
+	final private static Point SO = new Point(-5,-5);
+	final private static Point S = new Point(0,-5);
+	final private static Point SE = new Point(5,-5);
+	final private static Point init = new Point(0,0);
 	
-	public static Point[] tabOrientation = {E, NE, N, NO, O, SO, S, SE}; 
+	final private static Point[] tabOrientation = {E, NE, N, NO, O, SO, S, SE}; 
 	
 	public static void tourSensAntiHoraire(Strategie s){
 		
@@ -57,23 +57,27 @@ public class TestStrategie {
 	
 	public static void avanceJusqueLigneBlanche(Moteurs m, Pince p, Capteurs c, Strategie s){
 		c.calibration();
+		p.calibration();
 		
+		p.fermerPince();
 		m.avancer();
 
 		while(!c.getCurrentColor().equals(Couleur.blanc)){
 			Delay.msDelay(20);
 		}
 		m.arreter();
+		p.ouvrirPince();
 	}
 	
 	public static void main(String[] args) {
 
 		Moteurs m = new Moteurs();
-		Pince p = new Pince(500);
+		Pince p = new Pince();
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		//getPalet(m,p,c,s);
-		//tourSensHoraire(s);
-		avanceJusqueLigneBlanche(m,p,c,s);
+		s.intialisation();
+		s.allerChercherPallet(new Point(50,100));
+		s.rentrerALaMaison();
+		//avanceJusqueLigneBlanche(m,p,c,s);
 	}
 }
