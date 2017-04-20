@@ -1,6 +1,14 @@
 package Noname;
  
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.r2d2.vue.InputHandler;
 import org.r2d2.vue.Screen;
 
@@ -100,5 +108,37 @@ public class Capteurs implements APICapteurs{
 			calibrerCouleur(c);
 		}
 		System.out.println("calibration terminée");
+	}
+
+	/**
+	 * Sauvegarde la calibration
+	 * @throws IOException
+	 */
+	public void sauvegarderCalibration() throws IOException {
+		File file = new File("calibration");
+		if(file.exists()){
+			file.delete();
+		}
+		file.createNewFile();
+		ObjectOutputStream str = new ObjectOutputStream(new FileOutputStream(file));
+		str.writeObject(couleurs);
+		str.flush();
+		str.close();
+	}
+	
+	/**
+	 * Charge la calibration du fichier de configuration si elle existe
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public void chargerCalibration() throws FileNotFoundException, IOException, ClassNotFoundException {
+		File file = new File("calibration");
+		if(file.exists()){
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			couleurs = (float[][])ois.readObject();
+			ois.close();
+		}
 	}
 }
