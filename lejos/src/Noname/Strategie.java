@@ -11,6 +11,9 @@ public class Strategie {
 	private Pince pince;
 	
 	private MachineEtat etat;
+	private int[][][] tabPallet;
+	private int[][][] tabRobot;
+	
 	
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
 		this.capteur = ca;
@@ -65,7 +68,12 @@ public class Strategie {
 	}
 	
 	public Point detecterPlusProchePallet(){
-		
+		int indicePalletPlusProche = 0;
+		/*for(int i = 0; i < tabPallet.length; i++){
+			if(tabPallet[i][1]){
+				
+			}
+		}*/
 		return null;
 	}
 
