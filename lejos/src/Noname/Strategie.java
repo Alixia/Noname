@@ -2,6 +2,7 @@ package Noname;
 
 import java.awt.Point;
 
+import Noname.Outils.Couleur;
 import Noname.Outils.MachineEtat;
 import lejos.utility.Delay;
 
@@ -93,11 +94,7 @@ public class Strategie {
 		Point plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
 		return plusProche;
 	}
-	
-	private void rentrerALaMaison() {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 	private boolean allerChercherPallet(Point pallet) {
 		//avance jusqu'au pallet et le prend en pince
@@ -105,6 +102,7 @@ public class Strategie {
 		moteurs.avancer();
 		
 		//prendre en compte les erreurs potentielles du aux angles
+		//prendre en compte les obstacle
 		while(!capteur.boutonEstPresse() && !pointsEgaux(new Point(tabRobot[indiceAdverse][x],  tabRobot[indiceAdverse][y]), pallet)){
 			Delay.msDelay(200);
 			mettreAJourTab();
@@ -122,6 +120,22 @@ public class Strategie {
 	private void mettreAJourTab() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void rentrerALaMaison() {
+		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), new Point(50, 100));
+		moteurs.avancer();
+		
+		//prendre en compte les erreurs potentielles du aux angles
+		//prendre en compte les obstacle
+		while(!capteur.getCurrentColor().equals(Couleur.blanc)){
+			Delay.msDelay(200);
+		}
+		pince.ouvrirPince();
+		moteurs.reculer();
+		Delay.msDelay(200);
+		mettreAJourTab();
+	
 	}
 	
 
