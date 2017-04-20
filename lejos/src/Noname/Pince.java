@@ -12,72 +12,61 @@ import lejos.utility.Delay;
 public class Pince {
  		private EV3LargeRegulatedMotor pince; // Gestion de la pince
  		
-	 	private int nbIterations; // Nombre de pas qu'il faut pour ouvrir/fermer la pince
+ 		private long tempsPince; // Temps pour ouvrir et fermer la pince
 	 	private boolean isOpen; // Permet de savoir si la pince est ouverte
-	    private float vitessePince; // Vitesse d'ouverture et de fermeture de la pince
-	    final int vitesseDefaut = 250;
+	 	final private int vitessePince = 2000; // Vitesse d'ouverture et de fermeture de la pince
+	    final private int tempsOuverture = 500; // Temps d'ouverture arbitraire fixe
+	    final private int tempsFermeture = (int)(tempsOuverture*0.98); // Vitesse de la pince a la calibration
 		
 		// Constructeur par defaut
 		public Pince(){
-			this.vitessePince = this.vitesseDefaut;
-			initialisation();
-		}
-		
-		// Constructeur avec prise en compte de vitesse de la pince vP
-		public Pince(int vP){
-			 this.vitessePince = vP;
-			 initialisation();
-		}
-		
-		// Initialisation et lancement de la calibration
-		public void initialisation(){
 			this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
-			this.pince.setSpeed(this.vitessePince);
-			nbIterations = 0;
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince
 		public void calibration(){
 			InputHandler ih = new InputHandler(new Screen());
-			
-			//this.pince.setSpeed(this.vitesseDefaut); // Vitesse agreable pour la calibration
-			nbIterations = 0; // Nombre de pas qu'il faut pour ouvrir/fermer
+			this.pince.setSpeed(400);
 			
 			// Message de prevention
 			System.out.println("Calibration de la pince");
-			Button.ENTER.waitForPressAndRelease();
-			Delay.msDelay(1000); // Attente du realease du bouton 
+			System.out.println("Pinces ouvertes ? (Oui : RIGHT/ Non : LEFT)");
+			
+			// Tant que ce n'est ni LEFT ni RIGHT, redemander
+			boolean reAsk = true;
+			while(reAsk){
+				Button.waitForAnyPress();
+				if(Button.LEFT.isDown()){
+					System.out.println("Appuyez sur OK");
+					pince.forward(); // Ouvrir la pince
+					Button.ENTER.waitForPressAndRelease();
+					pince.stop();
+					reAsk = false;
+				}else if(Button.RIGHT.isDown()){
+					reAsk = false;
+				}else{
+					System.out.println("Pinces ouvertes ? (Oui : RIGHT/ Non : LEFT)");
+				}
+			}
 			
 			// Fermeture de la pince
-			System.out.println("Appuyez sur OK lorsque la pince est fermee sur un palet");
-			while(!ih.enterPressed()){ // Tant que l'user n'appuie pas sur OK
-				pince.backward(); // Fermer la pince d'un pas
-			}
+			System.out.println("Fermeture sur Palet");
+			Button.ENTER.waitForPressAndRelease();
+			System.out.println("Appuyez sur OK");
+			pince.backward(); // Fermer la pince
+			Button.ENTER.waitForPress();
 			pince.stop();
-			Delay.msDelay(1000); // Attente du realease du bouton 
-
-			System.out.println("Appuyez sur OK lorsque la pince est ouverte");
-			while(!ih.enterPressed()){ // Tant que l'user n'appuie pas sur OK
-				pince.forward(); // Ouvrir la pince d'un pas
-				nbIterations++;
-			}
-			pince.stop();
-			Delay.msDelay(1000); // Attente du realease du bouton 
-
-			isOpen = true; // La pince est ouverte a la fin de la calibration
 			
-			// 
-			//this.nbIterations /= (this.vitessePince/this.vitesseDefaut);
-			
-			//this.pince.setSpeed(this.vitessePince); // Retablissement de la vitesse voulue
+			isOpen = false; // Ouverture a la fin de la calibration
+			this.pince.setSpeed(vitessePince);
 		}
 		
 		// Ouverture de la pince
 		public void ouvrirPince(){
 			if(!isOpen){ // Uniquement si elle est fermee
-				for(int i=0;i<nbIterations;i++){
-					pince.forward();
-				}
+				pince.forward();
+				Delay.msDelay(tempsOuverture); 
+				pince.stop();
 			}
 			isOpen = true;
 		}
@@ -85,9 +74,9 @@ public class Pince {
 		// Fermeture de la pince 
 		public void fermerPince(){
 			if(isOpen){ // Uniquement si elle est ouverte
-				for(int i=0;i<nbIterations;i++){
-					pince.backward();
-				}
+				pince.backward();
+				Delay.msDelay(tempsFermeture); 
+				pince.stop();
 			}
 			isOpen = false;
 		}
