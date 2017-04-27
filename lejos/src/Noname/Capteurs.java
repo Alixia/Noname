@@ -9,12 +9,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.r2d2.vue.InputHandler;
-import org.r2d2.vue.Screen;
-
 import Noname.API.APICapteurs;
 import Noname.Outils.Constantes;
 import Noname.Outils.Couleur;
+import Noname.Outils.InputHandler;
+import Noname.Outils.Screen;
 import lejos.hardware.Button;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
@@ -38,7 +37,7 @@ public class Capteurs implements APICapteurs{
 		couleurs = new float[Couleur.values().length][1];
 	}
 	
-	@Override
+	
 	public boolean boutonEstPresse() {
 		float[] sample = new float[1];
         boutonPoussoir.fetchSample(sample, 0);
@@ -46,7 +45,7 @@ public class Capteurs implements APICapteurs{
         return sample[0] != 0;
 	}
 
-	@Override
+	
 	public float distanceVision() {
 		float[] echantillon = new float[1];
 		ultrasons.fetchSample(echantillon, 0);
@@ -98,6 +97,7 @@ public class Capteurs implements APICapteurs{
 	public float[][] getCalibration() {
 		return couleurs;
 	}
+	
 	public void calibration(){
 		InputHandler ih = new InputHandler(new Screen());
 		System.out.println("début de la calibration des couleurs");

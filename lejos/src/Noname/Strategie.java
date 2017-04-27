@@ -23,7 +23,8 @@ public class Strategie {
 	private int x = 1;
 	private int y = 2;
 	private double margeErreur = 5;
-	private Point cage;
+	private int yCageAdverse;
+	private int yCage;
 	public Cam cam;
 	private Thread ThreadCam;
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
@@ -35,59 +36,70 @@ public class Strategie {
 		cam = new Cam();
 		ThreadCam = new Thread(cam);
 
-		mettreAJourTab();
 		indiceRobot = 0;
 		indiceAdverse = 1;
-		cage = new Point(0,0);
+		miseAJour();
 	}
 	
 	public void calibration(){
 		System.out.println("Calibration du terrain");
-		System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
+		System.out.println("Le robot est a gauche ou a droite ? (bouton gauche et droit)");
 		// Tant que ce n'est ni LEFT ni RIGHT, redemander
 		boolean reAsk = true;
 		while(reAsk){
 			Button.waitForAnyPress();
 			if(Button.LEFT.isDown()){
-				moteurs.setangle(0);
-				tabRobot[indiceRobot][x] = 106;
-				tabRobot[indiceRobot][y] = 19;
-				cage = new Point(106,275);
-				
-				tabRobot[indiceAdverse][x] = 106;
-				tabRobot[indiceAdverse][y] = 275;
+				moteurs.setAngle(0);
+				indiceRobot = 0;
+				indiceAdverse = 1;
 				reAsk = false;
 			}else if(Button.RIGHT.isDown()){
-				moteurs.setangle(180);
-				tabRobot[indiceRobot][x] = 106;
-				tabRobot[indiceRobot][y] = 275;
-				cage = new Point(106,19);
-				
-				tabRobot[indiceAdverse][x] = 106;
-				tabRobot[indiceAdverse][y] = 19;
+				moteurs.setAngle(180);
+				indiceRobot = 0;
+				indiceAdverse = 1;
 				reAsk = false;
 			}else{
 				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
 			}
-		} 
+		}
+		// Le but est du cote du robot adverse au debut
+		yCage = tabRobot[indiceAdverse][y];
+		yCageAdverse = tabRobot[indiceRobot][y];
 	}
 
 	public void intialisation() {
-
 		try {
 			capteur.chargerCalibration();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-
 		calibration();
+	}
+	
+	public void ramenerPremierPalet(){
+		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
+		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
+		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
+		seDirigerVers(pos,dest);
+		miseAJour();
+		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
+		dest.move(tabRobot[indiceRobot][x], yCage);
+		seDirigerVers(pos, dest);
+		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
+			moteurs.avancer();
+			while(!capteur.getCurrentColor().equals(Couleur.blanc) && ((Math.abs(tabRobot[indiceAdverse][x] - tabRobot[indiceRobot][x]) > 20)  || (Math.abs(tabRobot[indiceAdverse][y] - tabRobot[indiceRobot][y]) > 40))){
+				Delay.msDelay(200);
+				miseAJour();
+			}
+			moteurs.arreter();
+		}
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
 		moteurs.arreter();
 		if (destination.y == positionRobot.y) {
 			double angleAFaire = 0;
-			angleAFaire += moteurs.angleInitial(true, 120);
+			angleAFaire += moteurs.angleInitial(true);
 			if (positionRobot.x < destination.x) {
 				moteurs.tourner(90+angleAFaire, false, 120);
 			} else {
@@ -97,10 +109,10 @@ public class Strategie {
 			double angleAFaire = 0;
 			boolean face;
 			if (positionRobot.y < destination.y) {
-				angleAFaire += moteurs.angleInitial(true, 200);
+				angleAFaire += moteurs.angleInitial(true);
 				face = true;
 			} else {
-				angleAFaire += moteurs.angleInitial(false, 200);
+				angleAFaire += moteurs.angleInitial(false);
 				face = false;
 			}
 			double tangenteTeta = Math.abs(destination.x - positionRobot.x) / Math.abs(destination.y - positionRobot.y);
@@ -127,7 +139,6 @@ public class Strategie {
 	}
 
 	public boolean pointsEgaux(Point p1, Point p2) {
-
 		return ((p1.x <= p2.x + margeErreur) && (p1.x >= p2.x + margeErreur));
 	}
 
@@ -164,7 +175,7 @@ public class Strategie {
 									 * tabRobot[indiceAdverse][y]), pallet)
 									 */) {
 			Delay.msDelay(200);
-			mettreAJourTab();
+			miseAJour();
 		}
 
 		if (capteur.boutonEstPresse()) {
@@ -176,15 +187,28 @@ public class Strategie {
 		return false;
 	}
 
-	// met a jour les tableau palet et robot
-	public void mettreAJourTab() {
-		tabPallet = cam.getPalets();
-		tabRobot = cam.getRobots();
-
+	// met a jour les tableau palet et robot et l'angle
+	public void miseAJour() {
+		int[][] newTabPallet = cam.getPalets();
+		int[][] newTabRobot = cam.getRobots();
+		double teta = 0;
+		if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
+			if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
+				teta = 90;
+			}
+			else
+				teta = 120;
+		}
+		else{
+			double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
+			teta = Math.atan(tangenteTeta);
+		}
+		tabPallet = newTabPallet;
+		tabRobot = newTabRobot;
 	}
 
 	public void rentrerALaMaison() {
-		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), cage);
+		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), new Point(100,yCageAdverse));
 		moteurs.avancer();
 
 		// prendre en compte les erreurs potentielles du aux angles
@@ -198,8 +222,7 @@ public class Strategie {
 		Delay.msDelay(200);
 		moteurs.arreter();
 
-		mettreAJourTab();
-
+		miseAJour();
 	}
 
 	public void lancerCam() {
@@ -238,5 +261,4 @@ public class Strategie {
 			}
 		}
 	}
-
 }
