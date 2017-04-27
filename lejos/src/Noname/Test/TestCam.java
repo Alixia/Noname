@@ -1,12 +1,11 @@
 package Noname.Test;
 
-import org.r2d2.vue.InputHandler;
-import org.r2d2.vue.Screen;
-
 import Noname.Capteurs;
 import Noname.Moteurs;
 import Noname.Pince;
 import Noname.Strategie;
+import Noname.Outils.InputHandler;
+import Noname.Outils.Screen;
 
 public class TestCam {
 

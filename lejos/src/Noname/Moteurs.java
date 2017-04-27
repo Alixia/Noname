@@ -11,8 +11,6 @@ import lejos.utility.Delay;
 
 import java.awt.Point;
 
-import org.r2d2.utils.R2D2Constants;
-
 import Noname.API.APIMoteurs;
 import Noname.Outils.Constantes;
 import lejos.hardware.Button;
