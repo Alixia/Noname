@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import Noname.Outils.Couleur;
 import Noname.Outils.MachineEtat;
+import lejos.hardware.Button;
 import lejos.utility.Delay;
 
 public class Strategie {
@@ -22,7 +23,7 @@ public class Strategie {
 	private int x = 1;
 	private int y = 2;
 	private double margeErreur = 5;
-
+	private Point cage;
 	public Cam cam;
 
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
@@ -30,22 +31,55 @@ public class Strategie {
 		this.moteurs = m;
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
-		Cam cam = new Cam();
 
+		cam = new Cam();
+
+		mettreAJourTab();
+		indiceRobot = 0;
+		indiceAdverse = 1;
+		cage = new Point(0,0);
+	}
+	
+	public void calibration(){
+		System.out.println("Calibration du terrain");
+		System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
+		// Tant que ce n'est ni LEFT ni RIGHT, redemander
+		boolean reAsk = true;
+		while(reAsk){
+			Button.waitForAnyPress();
+			if(Button.LEFT.isDown()){
+				moteurs.setangle(0);
+				tabRobot[indiceRobot][x] = 106;
+				tabRobot[indiceRobot][y] = 19;
+				cage = new Point(106,275);
+				
+				tabRobot[indiceAdverse][x] = 106;
+				tabRobot[indiceAdverse][y] = 275;
+				reAsk = false;
+			}else if(Button.RIGHT.isDown()){
+				moteurs.setangle(180);
+				tabRobot[indiceRobot][x] = 106;
+				tabRobot[indiceRobot][y] = 275;
+				cage = new Point(106,19);
+				
+				tabRobot[indiceAdverse][x] = 106;
+				tabRobot[indiceAdverse][y] = 19;
+				reAsk = false;
+			}else{
+				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
+			}
+		} 
 	}
 
 	public void intialisation() {
-		pince.calibration();
 
 		try {
 			capteur.chargerCalibration();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-		moteurs.calibration();
-		// tests quand t'etais pas la
-		indiceRobot = 0;
-		indiceAdverse = 1;
+
+		calibration();
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
@@ -162,7 +196,7 @@ public class Strategie {
 	}
 
 	public void rentrerALaMaison() {
-		seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, 50));
+		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), cage);
 		moteurs.avancer();
 
 		// prendre en compte les erreurs potentielles du aux angles

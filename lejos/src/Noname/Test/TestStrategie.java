@@ -71,14 +71,14 @@ public class TestStrategie {
 	
 	public static void premiereEtape(Moteurs m, Pince p, Capteurs c, Strategie s){
 		s.intialisation();
-		s.allerChercherPallet(new Point(50,100));
+		s.allerChercherPallet(new Point(50, 225));
 		s.rentrerALaMaison();
 	}
 	
 	public static void main(String[] args) {
 
 		Moteurs m = new Moteurs();
-		Pince p = new Pince();
+		Pince p = new Pince(true);
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
 		premiereEtape(m, p, c, s);
