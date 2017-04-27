@@ -25,7 +25,7 @@ public class Strategie {
 	private double margeErreur = 5;
 	private Point cage;
 	public Cam cam;
-
+	private Thread ThreadCam;
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
 		this.capteur = ca;
 		this.moteurs = m;
@@ -33,6 +33,7 @@ public class Strategie {
 		etat = MachineEtat.NOPALLET;
 
 		cam = new Cam();
+		ThreadCam = new Thread(cam);
 
 		mettreAJourTab();
 		indiceRobot = 0;
@@ -202,8 +203,22 @@ public class Strategie {
 	}
 
 	public void lancerCam() {
-		Thread t = new Thread(cam);
-		t.start();
+		ThreadCam.start();
+	}
+	
+
+	
+	public void afficherTableaux(){
+		
+		for(int i = 0;i<tabPallet.length;i++){
+			System.out.println( tabPallet[i][0] + ":" + tabPallet[i][1] + " / " + tabPallet[i][2]);
+			//Button.waitForAnyPress();
+		}
+		for(int i = 0;i<tabRobot.length;i++){
+			System.out.println( tabRobot[i][0] + ":" + tabRobot[i][1] + " / " + tabRobot[i][2]);
+			//Button.waitForAnyPress();
+		}
+		
 	}
 
 	public void run() {

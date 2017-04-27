@@ -7,6 +7,7 @@ import Noname.Capteurs;
 import Noname.Moteurs;
 import Noname.Pince;
 import Noname.Strategie;
+import lejos.hardware.Button;
 
 public class TestCam {
 
@@ -15,21 +16,15 @@ public class TestCam {
 		Pince p = new Pince(true);
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		InputHandler ih = new InputHandler(new Screen());
 		s.lancerCam();
-		
-		s.cam.affichePalets();
-		s.cam.afficheRobots();
-		ih.waitAny();
-		s.cam.affichePalets();
-		s.cam.afficheRobots();
-		ih.waitAny();
-		s.cam.affichePalets();
-		s.cam.afficheRobots();
-		ih.waitAny();
-		s.cam.affichePalets();
-		s.cam.afficheRobots();
-		ih.waitAny();
+
+		while (!Button.LEFT.isDown()) {
+			s.afficherTableaux();
+			
+			Button.waitForAnyPress();
+			
+		}
+
 	}
 
 }

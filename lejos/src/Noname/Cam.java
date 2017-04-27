@@ -4,6 +4,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.Random;
 
+import lejos.hardware.Button;
+
 public class Cam implements Runnable {
 
 	private int[][] palets;
@@ -21,6 +23,16 @@ public class Cam implements Runnable {
 
 		init();
 	}
+
+	public Cam(int nbPalets, int nbRobots) {
+		palets = new int[nbPalets][3];
+		robots = new int[nbRobots][3];
+		colision = 0;
+		distColision = 15;
+
+		init();
+	}
+	
 
 	private String changeMsg(String msg) {
 		// String msg =
@@ -50,36 +62,62 @@ public class Cam implements Runnable {
 
 	private void init() {
 		// index;x;y robot1
-		String msg = "0;50;100\n1;50;150\n2;50;200\n3;100;50\n4;100;100\n5;100;150\n6;100;200\n7;100;250\n8;150;100\n9;150;150\n10;150;200";
-		String[] buff = msg.split("\n");
+		// String msg =
+		// "0;50;100\n1;50;150\n2;50;200\n3;100;50\n4;100;100\n5;100;150\n6;100;200\n7;100;250\n8;150;100\n9;150;150\n10;150;200";
+		int port = 8888;
 
-		int irobot = 0;
-		int ipalet = 0;
+		try {
+			// Create a socket to listen on the port.
+			DatagramSocket dsocket = new DatagramSocket(port);
 
-		for (int i = 0; i < buff.length; i++) {
-			String[] coord = buff[i].split(";");
-			int x = Integer.parseInt(coord[1]);
-			int y = Integer.parseInt(coord[2]);
-			int index = Integer.parseInt(coord[0]);
+			// Create a buffer to read datagrams into. If a
+			// packet is larger than this buffer, the
+			// excess will simply be discarded!
+			byte[] buffer = new byte[2048];
 
-			if (y == 50 || y == 250) {
-				robots[irobot][0] = index;
-				robots[irobot][1] = x;
-				robots[irobot][2] = y;
-				irobot++;
-			} else {
-				palets[ipalet][0] = index;
-				palets[ipalet][1] = x;
-				palets[ipalet][2] = y;
-				ipalet++;
+			// Create a packet to receive data into the buffer
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
+			dsocket.receive(packet);
+
+			String msg = new String(buffer, 0, packet.getLength());
+
+			String[] buff = msg.split("\n");
+			dsocket.close();
+			int irobot = 0;
+			int ipalet = 0;
+
+			for (int i = 0; i < buff.length; i++) {
+				String[] coord = buff[i].split(";");
+				int x = Integer.parseInt(coord[1]);
+				int y = Integer.parseInt(coord[2]);
+				int index = Integer.parseInt(coord[0]);
+
+				if (y < 30 || y > 230) {
+					robots[irobot][0] = index;
+					robots[irobot][1] = x;
+					robots[irobot][2] = y;
+					irobot++;
+				} else {
+					palets[ipalet][0] = index;
+					palets[ipalet][1] = x;
+					palets[ipalet][2] = y;
+					ipalet++;
+				}
+
+				// System.out.println(Integer.toString(index) + ":" +
+				// Integer.toString(x) + " / " + Integer.toString(y));
 			}
 
-			// System.out.println(Integer.toString(index) + ":" +
-			// Integer.toString(x) + " / " + Integer.toString(y));
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 
 	public void MajCoords(String msg) {
+		// System.out.println("MajCoords");
+		System.out.println(affichePalets());
+		System.out.println(afficheRobots());
 		boolean[] bpalets = new boolean[9];
 		boolean[] brobots = new boolean[2];
 
@@ -103,7 +141,7 @@ public class Cam implements Runnable {
 
 		int irobot = 0;
 		int ipalet = 0;
-		System.out.println("nbre donnees reçues: " + buff.length);
+		// System.out.println("nbre donnees reçues: " + buff.length);
 		for (int i = 0; i < buff.length; i++) {
 			String[] coord = buff[i].split(";");
 			int x = Integer.parseInt(coord[1]);
@@ -122,11 +160,13 @@ public class Cam implements Runnable {
 				// System.out.println("currentP = " + current );
 
 				if (current <= distColision) {
-					System.out.println("palet colision[" + j + "][" + i + "] : current = " + current);
-					System.out.println("newx=" + newx + " newy=" + newy);
-					System.out.println("i: " + index + " recu: " + x + "/" + y + " - palets: i:" + palets[j][0] + " "
-							+ palets[j][1] + "/" + palets[j][2]);
-					System.out.println(affichePalets());
+					// System.out.println("palet colision[" + j + "][" + i + "]
+					// : current = " + current);
+					// System.out.println("newx=" + newx + " newy=" + newy);
+					// System.out.println("i: " + index + " recu: " + x + "/" +
+					// y + " - palets: i:" + palets[j][0] + " "
+					// + palets[j][1] + "/" + palets[j][2]);
+					// System.out.println(affichePalets());
 
 					colision++;
 					tabColisions[j][i] = true;
@@ -148,12 +188,15 @@ public class Cam implements Runnable {
 				// System.out.println("currentR = " + current );
 
 				if (current <= distColision) {
-					System.out.println("robot colision[" + j + "][" + i + "] : current = " + current);
-					System.out.println(x + " - " + robots[j][1] + " - " + y + " - " + robots[j][2]);
-					System.out.println("newx=" + newx + " newy=" + newy);
-					System.out.println("i: " + index + " recu: " + x + "/" + y + " - robots: i:" + robots[j][0] + " "
-							+ robots[j][1] + "/" + robots[j][2]);
-					System.out.println(afficheRobots());
+					// System.out.println("robot colision[" + j + "][" + i + "]
+					// : current = " + current);
+					// System.out.println(x + " - " + robots[j][1] + " - " + y +
+					// " - " + robots[j][2]);
+					// System.out.println("newx=" + newx + " newy=" + newy);
+					// System.out.println("i: " + index + " recu: " + x + "/" +
+					// y + " - robots: i:" + robots[j][0] + " "
+					// + robots[j][1] + "/" + robots[j][2]);
+					// System.out.println(afficheRobots());
 					colision++;
 					tabColisions[palets.length + j][i] = true;
 				} else {
@@ -168,19 +211,17 @@ public class Cam implements Runnable {
 			}
 
 			if (estRobot) {
-				synchronized (robots) {
-					robots[indexMax][0] = index;
-					robots[indexMax][1] = x;
-					robots[indexMax][2] = y;
-				}
+				robots[indexMax][0] = index;
+				robots[indexMax][1] = x;
+				robots[indexMax][2] = y;
+
 				brobots[indexMax] = true;
 
 			} else {
-				synchronized (palets) {
-					palets[indexMax][0] = index;
-					palets[indexMax][1] = x;
-					palets[indexMax][2] = y;
-				}
+				palets[indexMax][0] = index;
+				palets[indexMax][1] = x;
+				palets[indexMax][2] = y;
+
 				bpalets[indexMax] = true;
 
 			}
@@ -190,12 +231,12 @@ public class Cam implements Runnable {
 		}
 
 		if (colision > 11) {
-			System.out.println("COLISION! " + colision);
-			System.out.println("palets:\n" + affichePalets());
-			System.out.println("robots:\n" + afficheRobots());
-			System.out.println("robots:\n" + afficheColisions());
+			// System.out.println("COLISION! " + colision);
+			// System.out.println("palets:\n" + affichePalets());
+			// System.out.println("robots:\n" + afficheRobots());
+			// System.out.println("robots:\n" + afficheColisions());
 
-			pressAnyKeyToContinue();
+			// pressAnyKeyToContinue();
 		}
 
 	}
@@ -307,7 +348,7 @@ public class Cam implements Runnable {
 				// System.out.println(packet.getAddress().getHostName() + ": "
 				// + msg);
 				c.MajCoords(msg);
-				Thread.sleep(1000);
+				Thread.sleep(500);
 
 			}
 		} catch (Exception e) {
