@@ -24,7 +24,7 @@ public class TestCam {
 			Button.waitForAnyPress();
 			
 		}
-
+		
 	}
 
 }
