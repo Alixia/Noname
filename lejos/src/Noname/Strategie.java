@@ -48,7 +48,7 @@ public class Strategie {
 		while(reAsk){
 			Button.waitForAnyPress();
 			if(Button.LEFT.isDown()){
-				moteurs.setangle(0);
+				moteurs.setAngle(0);
 				tabRobot[indiceRobot][x] = 106;
 				tabRobot[indiceRobot][y] = 19;
 				cage = new Point(106,275);
@@ -57,7 +57,7 @@ public class Strategie {
 				tabRobot[indiceAdverse][y] = 275;
 				reAsk = false;
 			}else if(Button.RIGHT.isDown()){
-				moteurs.setangle(180);
+				moteurs.setAngle(180);
 				tabRobot[indiceRobot][x] = 106;
 				tabRobot[indiceRobot][y] = 275;
 				cage = new Point(106,19);
@@ -86,7 +86,7 @@ public class Strategie {
 		moteurs.arreter();
 		if (destination.y == positionRobot.y) {
 			double angleAFaire = 0;
-			angleAFaire += moteurs.angleInitial(true, 120);
+			angleAFaire += moteurs.angleInitial(true);
 			if (positionRobot.x < destination.x) {
 				moteurs.tourner(90+angleAFaire, false, 120);
 			} else {
@@ -96,10 +96,10 @@ public class Strategie {
 			double angleAFaire = 0;
 			boolean face;
 			if (positionRobot.y < destination.y) {
-				angleAFaire += moteurs.angleInitial(true, 200);
+				angleAFaire += moteurs.angleInitial(true);
 				face = true;
 			} else {
-				angleAFaire += moteurs.angleInitial(false, 200);
+				angleAFaire += moteurs.angleInitial(false);
 				face = false;
 			}
 			double tangenteTeta = Math.abs(destination.x - positionRobot.x) / Math.abs(destination.y - positionRobot.y);

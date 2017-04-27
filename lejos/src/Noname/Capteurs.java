@@ -37,7 +37,7 @@ public class Capteurs implements APICapteurs{
 		couleurs = new float[Couleur.values().length][1];
 	}
 	
-	@Override
+	
 	public boolean boutonEstPresse() {
 		float[] sample = new float[1];
         boutonPoussoir.fetchSample(sample, 0);
@@ -45,7 +45,7 @@ public class Capteurs implements APICapteurs{
         return sample[0] != 0;
 	}
 
-	@Override
+	
 	public float distanceVision() {
 		float[] echantillon = new float[1];
 		ultrasons.fetchSample(echantillon, 0);
@@ -97,6 +97,7 @@ public class Capteurs implements APICapteurs{
 	public float[][] getCalibration() {
 		return couleurs;
 	}
+	
 	public void calibration(){
 		InputHandler ih = new InputHandler(new Screen());
 		System.out.println("début de la calibration des couleurs");

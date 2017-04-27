@@ -7,14 +7,11 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.navigation.MoveProvider;
-import lejos.utility.Delay;
 
 import java.awt.Point;
 
 import Noname.API.APIMoteurs;
 import Noname.Outils.Constantes;
-import lejos.hardware.Button;
-import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Moteurs implements APIMoteurs, MoveListener {
@@ -31,7 +28,6 @@ public class Moteurs implements APIMoteurs, MoveListener {
     private boolean avance;
     
     private double angle;
-    private Point position;
     
     /*
      * Constructeur pour manipuler les roues et les pinces
@@ -53,7 +49,6 @@ public class Moteurs implements APIMoteurs, MoveListener {
     	this.pilot.setAngularSpeed(maxVitesseRoue);
 		pilot.addMoveListener(this);
 		
-		this.position = new Point();
 		this.angle = 0;
     }
     
@@ -115,11 +110,11 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		avance = false;
 	}
 
-	public double angle(){
+	public double getAngle(){
 		return angle;
 	}
 	
-	public void setangle(double angle){
+	public void setAngle(double angle){
 		this.angle = angle;
 	}
 	
@@ -137,7 +132,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		
 	}
 	
-	public double angleInitial(boolean face, float vitesse){
+	public double angleInitial(boolean face){
 		if(face){
 			if(angle > 180){
 				return 360-angle;
