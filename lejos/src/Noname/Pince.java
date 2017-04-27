@@ -19,8 +19,10 @@ public class Pince {
 	    final private int tempsFermeture = (int)(tempsOuverture*0.98); // Vitesse de la pince a la calibration
 		
 		// Constructeur par defaut
-		public Pince(){
+		public Pince(boolean estOuvert){
 			this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
+			this.pince.setSpeed(vitessePince);
+			this.isOpen = estOuvert;
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince

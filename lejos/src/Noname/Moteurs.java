@@ -59,16 +59,6 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		this.angle = 0;
     }
     
-    public void calibration(){
-    	System.out.println("Calibration de l'angle du robot");
-		Button.ENTER.waitForPressAndRelease();
-		Delay.msDelay(200); // Attente du realease du bouton
-		System.out.println("Appuyez sur le bouton quand le robot est à la position de base");
-		Button.ENTER.waitForPressAndRelease();
-		this.angle = 0;
-		position = new Point(0, 0);
-    }
-    
 	public void setVitesse(float v) {
 		vitesseRoues = v;
 		pilot.setLinearSpeed(v);
