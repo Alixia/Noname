@@ -191,20 +191,22 @@ public class Strategie {
 	public void miseAJour() {
 		int[][] newTabPallet = cam.getPalets();
 		int[][] newTabRobot = cam.getRobots();
-		double teta = 0;
-		if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
-			if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
-				teta = 90;
+		if((Math.abs(newTabPallet[indiceRobot][x] - tabPallet[indiceRobot][x]) < 10) || (Math.abs(newTabPallet[indiceRobot][y] - tabPallet[indiceRobot][y]) < 10)){
+			double teta = 0;
+			if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
+				if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
+					teta = 90;
+				}
+				else
+					teta = 120;
 			}
-			else
-				teta = 120;
+			else{
+				double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
+				teta = Math.atan(tangenteTeta);
+			}
+			tabPallet = newTabPallet;
+			tabRobot = newTabRobot;
 		}
-		else{
-			double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
-			teta = Math.atan(tangenteTeta);
-		}
-		tabPallet = newTabPallet;
-		tabRobot = newTabRobot;
 	}
 
 	public void rentrerALaMaison() {
