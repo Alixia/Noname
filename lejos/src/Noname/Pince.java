@@ -1,10 +1,10 @@
 package Noname;
 
 import lejos.robotics.chassis.Chassis;
-import org.r2d2.vue.InputHandler;
-import org.r2d2.vue.Screen;
 
 import Noname.Outils.Constantes;
+import Noname.Outils.InputHandler;
+import Noname.Outils.Screen;
 import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;

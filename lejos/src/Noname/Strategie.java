@@ -33,7 +33,7 @@ public class Strategie {
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
 		cam = new Cam();
-		mettreAJourTab();
+		miseAJour();
 	}
 	
 	public void calibration(){
@@ -94,7 +94,7 @@ public class Strategie {
 		moteurs.arreter();
 		if (destination.y == positionRobot.y) {
 			double angleAFaire = 0;
-			angleAFaire += moteurs.angleInitial(true, 120);
+			angleAFaire += moteurs.angleInitial(true);
 			if (positionRobot.x < destination.x) {
 				moteurs.tourner(90+angleAFaire, false, 120);
 			} else {
@@ -104,10 +104,10 @@ public class Strategie {
 			double angleAFaire = 0;
 			boolean face;
 			if (positionRobot.y < destination.y) {
-				angleAFaire += moteurs.angleInitial(true, 200);
+				angleAFaire += moteurs.angleInitial(true);
 				face = true;
 			} else {
-				angleAFaire += moteurs.angleInitial(false, 200);
+				angleAFaire += moteurs.angleInitial(false);
 				face = false;
 			}
 			double tangenteTeta = Math.abs(destination.x - positionRobot.x) / Math.abs(destination.y - positionRobot.y);
@@ -170,7 +170,7 @@ public class Strategie {
 									 * tabRobot[indiceAdverse][y]), pallet)
 									 */) {
 			Delay.msDelay(200);
-			mettreAJourTab();
+			miseAJour();
 		}
 
 		if (capteur.boutonEstPresse()) {
@@ -182,11 +182,24 @@ public class Strategie {
 		return false;
 	}
 
-	// met a jour les tableau palet et robot
-	public void mettreAJourTab() {
-		tabPallet = cam.getPalets();
-		tabRobot = cam.getRobots();
-
+	// met a jour les tableau palet et robot et l'angle
+	public void miseAJour() {
+		int[][] newTabPallet = cam.getPalets();
+		int[][] newTabRobot = cam.getRobots();
+		double teta = 0;
+		if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
+			if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
+				teta = 90;
+			}
+			else
+				teta = 120;
+		}
+		else{
+			double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
+			teta = Math.atan(tangenteTeta);
+		}
+		tabPallet = newTabPallet;
+		tabRobot = newTabRobot;
 	}
 
 	public void rentrerALaMaison() {
@@ -204,7 +217,7 @@ public class Strategie {
 		Delay.msDelay(200);
 		moteurs.arreter();
 
-		mettreAJourTab();
+		miseAJour();
 	}
 
 	public void lancerCam() {

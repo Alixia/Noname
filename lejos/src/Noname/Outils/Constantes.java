@@ -1,7 +1,5 @@
 package Noname.Outils;
 
-import org.r2d2.utils.R2D2Constants;
-
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
