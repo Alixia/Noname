@@ -8,14 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import Noname.API.APICapteurs;
 import Noname.Outils.Constantes;
 import Noname.Outils.Couleur;
 import Noname.Outils.InputHandler;
 import Noname.Outils.Screen;
-import lejos.hardware.Button;
-import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;

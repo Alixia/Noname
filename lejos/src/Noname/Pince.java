@@ -1,18 +1,14 @@
 package Noname;
 
-import lejos.robotics.chassis.Chassis;
-
+import Noname.API.APIPince;
 import Noname.Outils.Constantes;
-import Noname.Outils.InputHandler;
-import Noname.Outils.Screen;
 import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
-public class Pince {
+public class Pince implements APIPince {
  		private EV3LargeRegulatedMotor pince; // Gestion de la pince
  		
- 		private long tempsPince; // Temps pour ouvrir et fermer la pince
 	 	private boolean isOpen; // Permet de savoir si la pince est ouverte
 	 	final private int vitessePince = 2000; // Vitesse d'ouverture et de fermeture de la pince
 	    final private int tempsOuverture = 500; // Temps d'ouverture arbitraire fixe
@@ -27,7 +23,6 @@ public class Pince {
 
 		// Calibration de l'ouverture et fermeture de la pince
 		public void calibration(){
-			InputHandler ih = new InputHandler(new Screen());
 			this.pince.setSpeed(400);
 			
 			// Message de prevention

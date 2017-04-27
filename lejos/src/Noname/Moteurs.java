@@ -7,9 +7,6 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.navigation.MoveProvider;
-
-import java.awt.Point;
-
 import Noname.API.APIMoteurs;
 import Noname.Outils.Constantes;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
