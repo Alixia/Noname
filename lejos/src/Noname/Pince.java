@@ -18,7 +18,9 @@ public class Pince implements APIPince {
 		public Pince(boolean estOuvert){
 			this.pince = new EV3LargeRegulatedMotor(Constantes.pince.port());
 			this.pince.setSpeed(vitessePince);
-			this.isOpen = estOuvert;
+			if(!estOuvert)
+				this.ouvrirPince();
+			this.isOpen = true;
 		}
 
 		// Calibration de l'ouverture et fermeture de la pince

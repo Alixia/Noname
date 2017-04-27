@@ -35,10 +35,8 @@ public class Strategie {
 
 		cam = new Cam();
 		ThreadCam = new Thread(cam);
-
-		indiceRobot = 0;
-		indiceAdverse = 1;
-		miseAJour();
+	
+		intialisation();
 	}
 	
 	public void calibration(){
@@ -74,9 +72,16 @@ public class Strategie {
 			e.printStackTrace();
 		}
 		calibration();
+
+		lancerCam();
+		
+		tabPallet = cam.getPalets();
+		tabRobot = cam.getRobots();
+		
 	}
 	
 	public void ramenerPremierPalet(){
+		miseAJour();
 		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
 		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
@@ -165,6 +170,8 @@ public class Strategie {
 		// avance jusqu'au pallet et le prend en pince
 		seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
 		moteurs.avancer();
+		miseAJour();
+
 
 		// prendre en compte les erreurs potentielles du aux angles
 		// prendre en compte les obstacle
@@ -191,20 +198,26 @@ public class Strategie {
 	public void miseAJour() {
 		int[][] newTabPallet = cam.getPalets();
 		int[][] newTabRobot = cam.getRobots();
-		double teta = 0;
-		if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
-			if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
-				teta = 90;
+		System.out.println(newTabPallet.toString());
+		System.out.println(tabPallet.toString());
+		
+		if((Math.abs(newTabPallet[indiceRobot][x] - tabPallet[indiceRobot][x]) < 10) || (Math.abs(newTabPallet[indiceRobot][y] - tabPallet[indiceRobot][y]) < 10)){
+			double teta = 0;
+			if(newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]){
+				if(newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]){
+					teta = 90;
+				}
+				else
+					teta = 120;
 			}
-			else
-				teta = 120;
+			else{
+				double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
+				teta = Math.atan(tangenteTeta);
+			}
+			moteurs.setAngle(teta);
+			System.arraycopy(newTabPallet, 0, tabPallet, 0, tabPallet.length);
+			System.arraycopy(newTabRobot, 0, tabRobot, 0, tabRobot.length);
 		}
-		else{
-			double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
-			teta = Math.atan(tangenteTeta);
-		}
-		tabPallet = newTabPallet;
-		tabRobot = newTabRobot;
 	}
 
 	public void rentrerALaMaison() {
@@ -246,7 +259,6 @@ public class Strategie {
 
 	public void run() {
 		Point pallet;
-		lancerCam();
 		while (true) {
 			switch (etat) {
 			case NOPALLET:

@@ -44,8 +44,9 @@ public class Camera {
 					int index = Integer.parseInt(coord[0]);
 
 					System.out.println(Integer.toString(index) + ":" + Integer.toString(x) + " / " + Integer.toString(y));
-				Thread.sleep(1000);
 				}
+				System.out.println("");
+				//Thread.sleep(500);
 
 				// Reset the length of the packet before reusing it.
 				packet.setLength(buffer.length);
