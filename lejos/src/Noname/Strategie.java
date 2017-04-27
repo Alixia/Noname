@@ -23,7 +23,8 @@ public class Strategie {
 	private int x = 1;
 	private int y = 2;
 	private double margeErreur = 5;
-	private Point cage;
+	private int yCageAdverse;
+	private int yCage;
 	public Cam cam;
 
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
@@ -31,55 +32,62 @@ public class Strategie {
 		this.moteurs = m;
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
-
 		cam = new Cam();
-
 		mettreAJourTab();
-		indiceRobot = 0;
-		indiceAdverse = 1;
-		cage = new Point(0,0);
 	}
 	
 	public void calibration(){
 		System.out.println("Calibration du terrain");
-		System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
+		System.out.println("Le robot est a gauche ou a droite ? (bouton gauche et droit)");
 		// Tant que ce n'est ni LEFT ni RIGHT, redemander
 		boolean reAsk = true;
 		while(reAsk){
 			Button.waitForAnyPress();
 			if(Button.LEFT.isDown()){
 				moteurs.setangle(0);
-				tabRobot[indiceRobot][x] = 106;
-				tabRobot[indiceRobot][y] = 19;
-				cage = new Point(106,275);
-				
-				tabRobot[indiceAdverse][x] = 106;
-				tabRobot[indiceAdverse][y] = 275;
+				indiceRobot = 0;
+				indiceAdverse = 1;
 				reAsk = false;
 			}else if(Button.RIGHT.isDown()){
 				moteurs.setangle(180);
-				tabRobot[indiceRobot][x] = 106;
-				tabRobot[indiceRobot][y] = 275;
-				cage = new Point(106,19);
-				
-				tabRobot[indiceAdverse][x] = 106;
-				tabRobot[indiceAdverse][y] = 19;
+				indiceRobot = 0;
+				indiceAdverse = 1;
 				reAsk = false;
 			}else{
 				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
 			}
-		} 
+		}
+		// Le but est du cote du robot adverse au debut
+		yCage = tabRobot[indiceAdverse][y];
+		yCageAdverse = tabRobot[indiceRobot][y];
 	}
 
 	public void intialisation() {
-
 		try {
 			capteur.chargerCalibration();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-
 		calibration();
+	}
+	
+	public void ramenerPremierPalet(){
+		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
+		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
+		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
+		seDirigerVers(pos,dest);
+		mettreAJourTab();
+		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
+		dest.move(tabRobot[indiceRobot][x], yCage);
+		seDirigerVers(pos, dest);
+		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
+			moteurs.avancer();
+			while(!capteur.getCurrentColor().equals(Couleur.blanc) && ((Math.abs(tabRobot[indiceAdverse][x] - tabRobot[indiceRobot][x]) > 20)  || (Math.abs(tabRobot[indiceAdverse][y] - tabRobot[indiceRobot][y]) > 40))){
+				Delay.msDelay(200);
+				miseAJour();
+			}
+			moteurs.arreter();
+		}
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
@@ -126,7 +134,6 @@ public class Strategie {
 	}
 
 	public boolean pointsEgaux(Point p1, Point p2) {
-
 		return ((p1.x <= p2.x + margeErreur) && (p1.x >= p2.x + margeErreur));
 	}
 
@@ -198,7 +205,6 @@ public class Strategie {
 		moteurs.arreter();
 
 		mettreAJourTab();
-
 	}
 
 	public void lancerCam() {
@@ -223,5 +229,4 @@ public class Strategie {
 			}
 		}
 	}
-
 }
