@@ -34,7 +34,7 @@ public class Strategie {
 
 		cam = new Cam();
 
-		mettreAJourTab();
+		miseAJour();
 		indiceRobot = 0;
 		indiceAdverse = 1;
 		cage = new Point(0,0);
