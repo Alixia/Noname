@@ -51,36 +51,41 @@ public class Strategie {
 	public void seDirigerVers(Point positionRobot, Point destination) {
 		moteurs.arreter();
 		if (destination.y == positionRobot.y) {
-			moteurs.revenirAngleInitial(true, 120);
+			double angleAFaire = 0;
+			angleAFaire += moteurs.angleInitial(true, 120);
 			if (positionRobot.x < destination.x) {
-				moteurs.tourner(90, false, 120);
+				moteurs.tourner(90+angleAFaire, false, 120);
 			} else {
-				moteurs.tourner(-90, false, 120);
+				moteurs.tourner(-90+angleAFaire, false, 120);
 			}
 		} else {
+			double angleAFaire = 0;
 			boolean face;
 			if (positionRobot.y < destination.y) {
-				moteurs.revenirAngleInitial(true, 200);
+				angleAFaire += moteurs.angleInitial(true, 200);
 				face = true;
 			} else {
-				moteurs.revenirAngleInitial(false, 200);
+				angleAFaire += moteurs.angleInitial(false, 200);
 				face = false;
 			}
 			double tangenteTeta = Math.abs(destination.x - positionRobot.x) / Math.abs(destination.y - positionRobot.y);
 			double teta = Math.atan(tangenteTeta);
+			
+			double anglePlus = 1 * Math.toDegrees(teta) + angleAFaire;
+			double angleMoins = -1 * Math.toDegrees(teta) + angleAFaire;
 
 			if (positionRobot.x < destination.x) {
 				if (face) {
-					moteurs.tourner(1 * Math.toDegrees(teta), false, 120);
+					moteurs.tourner(anglePlus, false, 120);
 				} else {
-					moteurs.tourner(-1 * Math.toDegrees(teta), false, 120);
+					moteurs.tourner(angleMoins, false, 120);
 				}
 
 			} else {
 				if (face) {
-					moteurs.tourner(-1 * Math.toDegrees(teta), false, 120);
+					moteurs.tourner(angleMoins, false, 120);
 				} else {
-					moteurs.tourner(1 * Math.toDegrees(teta), false, 120);
+					moteurs.tourner(anglePlus, false, 120);
 				}
 			}
 		}
