@@ -14,7 +14,7 @@ public class Strategie {
 	private Capteurs capteur;
 	private Moteurs moteurs;
 	private Pince pince;
-	
+
 	private MachineEtat etat;
 	private int[][] tabPallet;
 	private int[][] tabRobot;
@@ -24,14 +24,17 @@ public class Strategie {
 	private int y = 2;
 	private double margeErreur = 5;
 	private Point cage;
-	
-	
+	public Cam cam;
+
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
 		this.capteur = ca;
 		this.moteurs = m;
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
-		tabRobot = new int[2][3];
+
+		cam = new Cam();
+
+		mettreAJourTab();
 		indiceRobot = 0;
 		indiceAdverse = 1;
 		cage = new Point(0,0);
@@ -65,17 +68,17 @@ public class Strategie {
 			}else{
 				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
 			}
-		}
+		} 
 	}
 
 	public void intialisation() {
-		//pince.calibration();
-		
+
 		try {
 			capteur.chargerCalibration();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
+
 		calibration();
 	}
 
@@ -99,8 +102,7 @@ public class Strategie {
 				angleAFaire += moteurs.angleInitial(false, 200);
 				face = false;
 			}
-			double tangenteTeta = Math.abs(destination.x - positionRobot.x)
-					/ Math.abs(destination.y - positionRobot.y);
+			double tangenteTeta = Math.abs(destination.x - positionRobot.x) / Math.abs(destination.y - positionRobot.y);
 			double teta = Math.atan(tangenteTeta);
 			
 			double anglePlus = 1 * Math.toDegrees(teta) + angleAFaire;
@@ -122,19 +124,22 @@ public class Strategie {
 			}
 		}
 	}
-	
-	public boolean pointsEgaux(Point p1, Point p2){
-		
+
+	public boolean pointsEgaux(Point p1, Point p2) {
+
 		return ((p1.x <= p2.x + margeErreur) && (p1.x >= p2.x + margeErreur));
 	}
-	
-	public Point detecterPlusProchePallet(){
+
+	public Point detecterPlusProchePallet() {
 		int indicePalletPlusProche = 0;
 		double distancePrec = 5000;
-		for(int i = 0; i < tabPallet.length; i++){
-			if((tabPallet[i][y]>50) && (tabPallet[i][y]<250) && !pointsEgaux(new Point(tabPallet[i][x], tabPallet[i][y]), new Point(tabRobot[indiceAdverse][x],tabRobot[indiceAdverse][y]))){
-				double distanceEnCours =  Math.sqrt(Math.pow(tabPallet[i][x]-tabRobot[indiceRobot][x], 2) + Math.pow(tabPallet[i][y]-tabRobot[indiceRobot][y], 2));
-				if( distancePrec > distanceEnCours ){
+		for (int i = 0; i < tabPallet.length; i++) {
+			if ((tabPallet[i][y] > 50) && (tabPallet[i][y] < 250)
+					&& !pointsEgaux(new Point(tabPallet[i][x], tabPallet[i][y]),
+							new Point(tabRobot[indiceAdverse][x], tabRobot[indiceAdverse][y]))) {
+				double distanceEnCours = Math.sqrt(Math.pow(tabPallet[i][x] - tabRobot[indiceRobot][x], 2)
+						+ Math.pow(tabPallet[i][y] - tabRobot[indiceRobot][y], 2));
+				if (distancePrec > distanceEnCours) {
 					indicePalletPlusProche = i;
 					distancePrec = distanceEnCours;
 				}
@@ -144,20 +149,24 @@ public class Strategie {
 		return plusProche;
 	}
 
-
 	public boolean allerChercherPallet(Point pallet) {
-		//avance jusqu'au pallet et le prend en pince
-		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), pallet);
+		// avance jusqu'au pallet et le prend en pince
+		seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
 		moteurs.avancer();
-		
-		//prendre en compte les erreurs potentielles du aux angles
-		//prendre en compte les obstacle
-		while(!capteur.boutonEstPresse() /*&& !pointsEgaux(new Point(tabRobot[indiceAdverse][x],  tabRobot[indiceAdverse][y]), pallet)*/){
+
+		// prendre en compte les erreurs potentielles du aux angles
+		// prendre en compte les obstacle
+		while (!capteur
+				.boutonEstPresse() /*
+									 * && !pointsEgaux(new
+									 * Point(tabRobot[indiceAdverse][x],
+									 * tabRobot[indiceAdverse][y]), pallet)
+									 */) {
 			Delay.msDelay(200);
 			mettreAJourTab();
 		}
-		
-		if(capteur.boutonEstPresse()){
+
+		if (capteur.boutonEstPresse()) {
 			moteurs.arreter();
 			pince.fermerPince();
 			return true;
@@ -166,20 +175,20 @@ public class Strategie {
 		return false;
 	}
 
-
-	//met a jour les tableau palet et robot
+	// met a jour les tableau palet et robot
 	public void mettreAJourTab() {
-		// TODO Auto-generated method stub
-		
+		tabPallet = cam.getPalets();
+		tabRobot = cam.getRobots();
+
 	}
-	
+
 	public void rentrerALaMaison() {
 		seDirigerVers(new Point(tabRobot[indiceRobot][x],  tabRobot[indiceRobot][y]), cage);
 		moteurs.avancer();
-		
-		//prendre en compte les erreurs potentielles du aux angles
-		//prendre en compte les obstacle
-		while(!capteur.getCurrentColor().equals(Couleur.blanc)){
+
+		// prendre en compte les erreurs potentielles du aux angles
+		// prendre en compte les obstacle
+		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
 			Delay.msDelay(200);
 		}
 		moteurs.arreter();
@@ -189,20 +198,25 @@ public class Strategie {
 		moteurs.arreter();
 
 		mettreAJourTab();
-	
+
 	}
-	
+
+	public void lancerCam() {
+		Thread t = new Thread(cam);
+		t.start();
+	}
 
 	public void run() {
 		Point pallet;
+		lancerCam();
 		while (true) {
 			switch (etat) {
 			case NOPALLET:
 				pallet = detecterPlusProchePallet();
 				if (allerChercherPallet(pallet)) {
 					etat = MachineEtat.PALLET;
-				} 
-			break;
+				}
+				break;
 			case PALLET:
 				rentrerALaMaison();
 				etat = MachineEtat.NOPALLET;
