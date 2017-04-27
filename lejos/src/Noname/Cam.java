@@ -15,6 +15,9 @@ public class Cam implements Runnable {
 	private int colision;
 	private int distColision;
 
+	private DatagramSocket dsocket;
+	private DatagramPacket packet;
+	private byte[] buffer;
 	public Cam() {
 		palets = new int[9][3];
 		robots = new int[2][3];
@@ -68,37 +71,70 @@ public class Cam implements Runnable {
 
 		try {
 			// Create a socket to listen on the port.
-			DatagramSocket dsocket = new DatagramSocket(port);
+			dsocket = new DatagramSocket(port);
 
 			// Create a buffer to read datagrams into. If a
 			// packet is larger than this buffer, the
 			// excess will simply be discarded!
-			byte[] buffer = new byte[2048];
+			buffer = new byte[2048];
 
 			// Create a packet to receive data into the buffer
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			packet = new DatagramPacket(buffer, buffer.length);
 
 			dsocket.receive(packet);
 
 			String msg = new String(buffer, 0, packet.getLength());
+			packet.setLength(buffer.length);
 
 			String[] buff = msg.split("\n");
-			dsocket.close();
 			int irobot = 0;
 			int ipalet = 0;
 
+			int indexMin = 0;
+			int indexMax = 0;
+			int ymin = 500;
+			int xmin = 500;
+			
+			int ymax = 0;
+			int xmax = 0;
+			
+			
 			for (int i = 0; i < buff.length; i++) {
 				String[] coord = buff[i].split(";");
 				int x = Integer.parseInt(coord[1]);
 				int y = Integer.parseInt(coord[2]);
 				int index = Integer.parseInt(coord[0]);
 
-				if (y < 30 || y > 230) {
-					robots[irobot][0] = index;
-					robots[irobot][1] = x;
-					robots[irobot][2] = y;
-					irobot++;
-				} else {
+				if(y < ymin){
+					ymin = y;
+					xmin = x;
+					indexMin=index;
+				}
+				
+				if(y > ymax ){
+					ymax=y;
+					xmax=x;
+					indexMax=index;
+				}
+				
+			}
+			
+			robots[0][0] = indexMin;
+			robots[0][1] = xmin;
+			robots[0][2] = ymin;
+			
+			robots[1][0] = indexMax;
+			robots[1][1] = xmax;
+			robots[1][2] = ymax;
+			
+			
+			for (int i = 0; i < buff.length; i++) {
+				String[] coord = buff[i].split(";");
+				int x = Integer.parseInt(coord[1]);
+				int y = Integer.parseInt(coord[2]);
+				int index = Integer.parseInt(coord[0]);
+
+				if (index != robots[0][0] && index != robots[1][0]){
 					palets[ipalet][0] = index;
 					palets[ipalet][1] = x;
 					palets[ipalet][2] = y;
@@ -108,16 +144,20 @@ public class Cam implements Runnable {
 				// System.out.println(Integer.toString(index) + ":" +
 				// Integer.toString(x) + " / " + Integer.toString(y));
 			}
+			
 
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+		
+		System.out.println(affichePalets());
+		System.out.println(afficheRobots());
+
 	}
 
 	public void MajCoords(String msg) {
 		// System.out.println("MajCoords");
-		System.out.println(affichePalets());
-		System.out.println(afficheRobots());
+
 		boolean[] bpalets = new boolean[9];
 		boolean[] brobots = new boolean[2];
 
@@ -137,12 +177,14 @@ public class Cam implements Runnable {
 			brobots[i] = false;
 		}
 
-		String[] buff = msg.split("\n");
+			String[] buff = msg.split("\n");
 
 		int irobot = 0;
 		int ipalet = 0;
 		// System.out.println("nbre donnees reçues: " + buff.length);
 		for (int i = 0; i < buff.length; i++) {
+
+
 			String[] coord = buff[i].split(";");
 			int x = Integer.parseInt(coord[1]);
 			int y = Integer.parseInt(coord[2]);
@@ -211,6 +253,7 @@ public class Cam implements Runnable {
 			}
 
 			if (estRobot) {
+				//System.out.println("Actualise Robot" + "" );
 				robots[indexMax][0] = index;
 				robots[indexMax][1] = x;
 				robots[indexMax][2] = y;
@@ -218,6 +261,8 @@ public class Cam implements Runnable {
 				brobots[indexMax] = true;
 
 			} else {
+				//System.out.println("Actualise Palet");
+
 				palets[indexMax][0] = index;
 				palets[indexMax][1] = x;
 				palets[indexMax][2] = y;
@@ -295,60 +340,42 @@ public class Cam implements Runnable {
 
 		int ok = 0;
 		int ko = 0;
-		for (int j = 0; j < 1000; j++) {
 			Cam c = new Cam();
-
-			String msg = "0;50;100\n1;50;150\n2;50;200\n3;100;50\n4;100;100\n5;100;150\n6;100;200\n7;100;250\n8;150;100\n9;150;150\n10;150;200";
-			// System.out.println(c.affichePalets());
-			// System.out.println(c.afficheRobots());
-
-			for (int i = 0; i < 10; i++) {
-				msg = c.changeMsg(msg);
-
-				c.MajCoords(msg);
-
-			}
-
-			if (c.getRobots()[0][0] == 3 && c.getRobots()[1][0] == 7) {
-				ok++;
-			} else {
-				ko++;
-			}
-			// System.out.println(msg);
-			// System.out.println(c.affichePalets());
-			System.out.println(c.afficheRobots());
-
-		}
-
-		System.out.println("ok=" + ok + " ko= " + ko);
+			Thread t = new Thread(c);
+			t.run();			
+	
 	}
 
 	@Override
 	public void run() {
-		Cam c = new Cam();
+	
 		int port = 8888;
 		try {
 			// Create a socket to listen on the port.
-			DatagramSocket dsocket = new DatagramSocket(port);
+			//DatagramSocket dsocket = new DatagramSocket(port);
 
 			// Create a buffer to read datagrams into. If a
 			// packet is larger than this buffer, the
 			// excess will simply be discarded!
-			byte[] buffer = new byte[2048];
+			//byte[] buffer = new byte[2048];
 
 			// Create a packet to receive data into the buffer
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			//DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			while (true) {
 				dsocket.receive(packet);
 
 				// Convert the contents to a string, and display them
-				// System.out.println("avant");
 				String msg = new String(buffer, 0, packet.getLength());
-				// System.out.println("apres");
+				System.out.println("------------debut--------------");
+				System.out.println(msg);
 				// System.out.println(packet.getAddress().getHostName() + ": "
 				// + msg);
-				c.MajCoords(msg);
-				Thread.sleep(500);
+				MajCoords(msg);
+				System.out.println(affichePalets());
+				System.out.println(afficheRobots());
+				System.out.println("---------------fin------------------");
+				packet.setLength(buffer.length);
+				//Thread.sleep(500);
 
 			}
 		} catch (Exception e) {

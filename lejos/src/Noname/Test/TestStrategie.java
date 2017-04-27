@@ -70,9 +70,8 @@ public class TestStrategie {
 	}
 	
 	public static void premiereEtape(Moteurs m, Pince p, Capteurs c, Strategie s){
-		s.intialisation();
-		s.allerChercherPallet(new Point(50, 225));
-		s.rentrerALaMaison();
+		s.allerChercherPallet(s.detecterPlusProchePallet());
+		s.ramenerPremierPalet();
 	}
 	
 	public static void main(String[] args) {
