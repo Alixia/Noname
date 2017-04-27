@@ -138,7 +138,7 @@ public class Strategie {
 		}
 	}
 
-	public boolean pointsEgaux(Point p1, Point p2) {
+	private boolean pointsEgaux(Point p1, Point p2) {
 		return ((p1.x <= p2.x + margeErreur) && (p1.x >= p2.x + margeErreur));
 	}
 
