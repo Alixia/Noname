@@ -69,15 +69,18 @@ public class TestStrategie {
 		p.ouvrirPince();
 	}
 	
+	public static void premiereEtape(Moteurs m, Pince p, Capteurs c, Strategie s){
+		s.intialisation();
+		s.allerChercherPallet(new Point(50,100));
+		s.rentrerALaMaison();
+	}
+	
 	public static void main(String[] args) {
 
 		Moteurs m = new Moteurs();
 		Pince p = new Pince();
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p);
-		s.intialisation();
-		s.allerChercherPallet(new Point(50,100));
-		s.rentrerALaMaison();
-		//avanceJusqueLigneBlanche(m,p,c,s);
+		premiereEtape(m, p, c, s);
 	}
 }

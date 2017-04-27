@@ -100,10 +100,10 @@ public class Moteurs implements APIMoteurs, MoveListener {
 			pilot.rotate(i);
 			this.angle = angle + i;
 		}
-		if(angle >= 360){
+		while(angle >= 360){
 			this.angle -= 360;
 		}
-		if(angle < 0){
+		while(angle < 0){
 			this.angle += 360;
 		}
 	}
@@ -145,6 +145,19 @@ public class Moteurs implements APIMoteurs, MoveListener {
 			}
 		}else{
 			tourner(180-angle, false, vitesse);
+		}
+		
+	}
+	
+	public double angleInitial(boolean face, float vitesse){
+		if(face){
+			if(angle > 180){
+				return 360-angle;
+			}else{
+				return -angle;
+			}
+		}else{
+			return 180-angle;
 		}
 		
 	}
