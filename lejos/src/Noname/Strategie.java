@@ -76,7 +76,7 @@ public class Strategie {
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
 		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
 		seDirigerVers(pos,dest);
-		mettreAJourTab();
+		miseAJour();
 		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		dest.move(tabRobot[indiceRobot][x], yCage);
 		seDirigerVers(pos, dest);
