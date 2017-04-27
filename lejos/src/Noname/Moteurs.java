@@ -13,17 +13,20 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Moteurs implements APIMoteurs, MoveListener {
 
+	//gestion des roues
     private EV3LargeRegulatedMotor rDroite;
     private EV3LargeRegulatedMotor rGauche;
     private MovePilot pilot;
  	private Wheel roueDroite;
  	private Wheel roueGauche;
  	private Chassis chassis;
+ 	private boolean avance;
     
+ 	//gestion des vitesses
     private static float maxVitesseRoue = 200;
     private float vitesseRoues;
-    private boolean avance;
     
+    //gestion de l'angle
     private double angle;
     
     /*

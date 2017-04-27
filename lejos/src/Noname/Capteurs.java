@@ -22,10 +22,16 @@ import lejos.robotics.filter.MeanFilter;
 
 public class Capteurs implements APICapteurs{
 	
+	//gestion du bouton poussoir
 	private EV3TouchSensor boutonPoussoir;
+	
+	//gestion des couleurs
 	private EV3ColorSensor colorimetre;
-	private EV3UltrasonicSensor ultrasons;
 	private float[][] couleurs;
+	
+	//gestion des distances (yeux)
+	private EV3UltrasonicSensor ultrasons;
+	
 
 	public Capteurs(){
 		this.boutonPoussoir = new EV3TouchSensor(Constantes.boutonPoussoir.port());
