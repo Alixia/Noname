@@ -1,8 +1,10 @@
 package Noname;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.Random;
 
-public class Cam {
+public class Cam implements Runnable {
 
 	private int[][] palets;
 	private int[][] robots;
@@ -22,7 +24,8 @@ public class Cam {
 
 	private String changeMsg(String msg) {
 		// String msg =
-		//String msg = "0;50;100\n1;50;150\n2;50;200\n3;100;50\n4;100;100\n5;100;150\n6;100;200\n7;100;250\n8;150;100\n9;150;150\n10;150;200";
+		// String msg =
+		// "0;50;100\n1;50;150\n2;50;200\n3;100;50\n4;100;100\n5;100;150\n6;100;200\n7;100;250\n8;150;100\n9;150;150\n10;150;200";
 		String[] buff = msg.split("\n");
 		String Nextmsg = "";
 
@@ -119,15 +122,16 @@ public class Cam {
 				// System.out.println("currentP = " + current );
 
 				if (current <= distColision) {
-					System.out.println("palet colision["+j+"]["+i+"] : current = "+current);
-					System.out.println("newx="+newx + " newy=" + newy);
-					System.out.println("i: "+ index + " recu: " + x + "/" + y +" - palets: i:" +palets[j][0]+ " " + palets[j][1] + "/" + palets[j][2]);
+					System.out.println("palet colision[" + j + "][" + i + "] : current = " + current);
+					System.out.println("newx=" + newx + " newy=" + newy);
+					System.out.println("i: " + index + " recu: " + x + "/" + y + " - palets: i:" + palets[j][0] + " "
+							+ palets[j][1] + "/" + palets[j][2]);
 					System.out.println(affichePalets());
 
 					colision++;
 					tabColisions[j][i] = true;
-				}else{
-					//System.out.println("palets pas colision: "+current);
+				} else {
+					// System.out.println("palets pas colision: "+current);
 				}
 
 				if (max > current && bpalets[j] == false) {
@@ -140,23 +144,22 @@ public class Cam {
 				int newx = x - robots[j][1];
 				int newy = y - robots[j][2];
 
-				
 				current = Math.sqrt(newx * newx + newy * newy);
 				// System.out.println("currentR = " + current );
-				
+
 				if (current <= distColision) {
-					System.out.println("robot colision["+j+"]["+i+"] : current = "+current);
-					System.out.println(x + " - " + robots[j][1] + " - " + y +" - " + robots[j][2]);
-					System.out.println("newx="+newx + " newy=" + newy);
-					System.out.println("i: "+ index + " recu: " + x + "/" + y +" - robots: i:" +robots[j][0]+ " " + robots[j][1] + "/" + robots[j][2]);
+					System.out.println("robot colision[" + j + "][" + i + "] : current = " + current);
+					System.out.println(x + " - " + robots[j][1] + " - " + y + " - " + robots[j][2]);
+					System.out.println("newx=" + newx + " newy=" + newy);
+					System.out.println("i: " + index + " recu: " + x + "/" + y + " - robots: i:" + robots[j][0] + " "
+							+ robots[j][1] + "/" + robots[j][2]);
 					System.out.println(afficheRobots());
 					colision++;
 					tabColisions[palets.length + j][i] = true;
-				}else{
-					//System.out.println("robots pas colision: "+current);
+				} else {
+					// System.out.println("robots pas colision: "+current);
 				}
-				
-				
+
 				if (max >= current && brobots[j] == false) {
 					max = current;
 					indexMax = j;
@@ -165,15 +168,19 @@ public class Cam {
 			}
 
 			if (estRobot) {
-				robots[indexMax][0] = index;
-				robots[indexMax][1] = x;
-				robots[indexMax][2] = y;
+				synchronized (robots) {
+					robots[indexMax][0] = index;
+					robots[indexMax][1] = x;
+					robots[indexMax][2] = y;
+				}
 				brobots[indexMax] = true;
 
 			} else {
-				palets[indexMax][0] = index;
-				palets[indexMax][1] = x;
-				palets[indexMax][2] = y;
+				synchronized (palets) {
+					palets[indexMax][0] = index;
+					palets[indexMax][1] = x;
+					palets[indexMax][2] = y;
+				}
 				bpalets[indexMax] = true;
 
 			}
@@ -187,7 +194,7 @@ public class Cam {
 			System.out.println("palets:\n" + affichePalets());
 			System.out.println("robots:\n" + afficheRobots());
 			System.out.println("robots:\n" + afficheColisions());
-			
+
 			pressAnyKeyToContinue();
 		}
 
@@ -215,10 +222,9 @@ public class Cam {
 		int colonnes = tabColisions[0].length;
 		for (int i = 0; i < lignes; i++) {
 			for (int j = 0; j < colonnes; j++) {
-				if(tabColisions[i][j]){
+				if (tabColisions[i][j]) {
 					buffer += "1 ";
-				}
-				else{
+				} else {
 					buffer += "0 ";
 				}
 			}
@@ -274,6 +280,39 @@ public class Cam {
 		}
 
 		System.out.println("ok=" + ok + " ko= " + ko);
+	}
+
+	@Override
+	public void run() {
+		Cam c = new Cam();
+		int port = 8888;
+		try {
+			// Create a socket to listen on the port.
+			DatagramSocket dsocket = new DatagramSocket(port);
+
+			// Create a buffer to read datagrams into. If a
+			// packet is larger than this buffer, the
+			// excess will simply be discarded!
+			byte[] buffer = new byte[2048];
+
+			// Create a packet to receive data into the buffer
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			while (true) {
+				dsocket.receive(packet);
+
+				// Convert the contents to a string, and display them
+				// System.out.println("avant");
+				String msg = new String(buffer, 0, packet.getLength());
+				// System.out.println("apres");
+				// System.out.println(packet.getAddress().getHostName() + ": "
+				// + msg);
+				c.MajCoords(msg);
+				Thread.sleep(1000);
+
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 
 }
