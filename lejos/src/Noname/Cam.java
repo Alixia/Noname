@@ -150,8 +150,6 @@ public class Cam implements Runnable {
 			System.out.println(e);
 		}
 		
-		System.out.println(affichePalets());
-		System.out.println(afficheRobots());
 
 	}
 
@@ -366,14 +364,9 @@ public class Cam implements Runnable {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, packet.getLength());
-				System.out.println("------------debut--------------");
-				System.out.println(msg);
 				// System.out.println(packet.getAddress().getHostName() + ": "
 				// + msg);
 				MajCoords(msg);
-				System.out.println(affichePalets());
-				System.out.println(afficheRobots());
-				System.out.println("---------------fin------------------");
 				packet.setLength(buffer.length);
 				//Thread.sleep(500);
 

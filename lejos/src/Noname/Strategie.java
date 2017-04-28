@@ -53,8 +53,8 @@ public class Strategie {
 				reAsk = false;
 			}else if(Button.RIGHT.isDown()){
 				moteurs.setAngle(180);
-				indiceRobot = 0;
-				indiceAdverse = 1;
+				indiceRobot = 1;
+				indiceAdverse = 0;
 				reAsk = false;
 			}else{
 				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
@@ -71,12 +71,14 @@ public class Strategie {
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-		calibration();
-
+		
 		lancerCam();
 		
 		tabPallet = cam.getPalets();
 		tabRobot = cam.getRobots();
+		calibration();
+
+		
 		
 	}
 	
