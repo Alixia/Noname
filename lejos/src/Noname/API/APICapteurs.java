@@ -8,7 +8,7 @@ import Noname.Outils.Couleur;
 public interface APICapteurs {
 
 	/**
-	 * 
+	 * Savoir si le bouton poussoir est pressé
 	 * @return true si le bouton poussoir est pressé
 	 */
 	public boolean boutonEstPresse();
