@@ -113,7 +113,7 @@ public class Strategie {
 			moteurs.avancer();
 			while(enCours && ((Math.abs(tabRobot[indiceAdverse][x] - tabRobot[indiceRobot][x]) > 20)  || (Math.abs(tabRobot[indiceAdverse][y] - tabRobot[indiceRobot][y]) > 40))){
 				Delay.msDelay(10);
-				if(!capteur.getCurrentColor().equals(Couleur.blanc)){
+				if(capteur.getCurrentColor().equals(Couleur.blanc)){
 					enCours = false;
 				}
 				miseAJour();
