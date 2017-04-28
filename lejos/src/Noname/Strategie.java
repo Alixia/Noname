@@ -25,6 +25,8 @@ public class Strategie {
 	private double margeErreur = 5;
 	private int yCageAdverse;
 	private int yCage;
+	private int yMin;
+	private int yMax;
 	public Cam cam;
 	private Thread ThreadCam;
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
@@ -41,28 +43,30 @@ public class Strategie {
 	
 	public void calibration(){
 		System.out.println("Calibration du terrain");
-		System.out.println("Le robot est a gauche ou a droite ? (bouton gauche et droit)");
 		// Tant que ce n'est ni LEFT ni RIGHT, redemander
 		boolean reAsk = true;
-		while(reAsk){
+		do{
+			System.out.println("Le robot est a gauche ou a droite ? (bouton gauche et droit)");
 			Button.waitForAnyPress();
+			// Si le robot commence la partie a gauche
 			if(Button.LEFT.isDown()){
 				moteurs.setAngle(0);
 				indiceRobot = 0;
 				indiceAdverse = 1;
 				reAsk = false;
-			}else if(Button.RIGHT.isDown()){
+			}else if(Button.RIGHT.isDown()){ // Robot commence a droite
 				moteurs.setAngle(180);
 				indiceRobot = 1;
 				indiceAdverse = 0;
 				reAsk = false;
-			}else{
-				System.out.println("Le robot est a gauche ou a droit ? (bouton gauche et droit)");
 			}
-		}
+		}while(reAsk);
 		// Le but est du cote du robot adverse au debut
 		yCage = tabRobot[indiceAdverse][y];
 		yCageAdverse = tabRobot[indiceRobot][y];
+		// Enregistrement des lignes blanches
+		yMax = (yCage>yCageAdverse)?yCage:yCageAdverse;
+		yMin = (yCage>yCageAdverse)?yCageAdverse:yCage;
 	}
 
 	public void intialisation() {
@@ -77,15 +81,16 @@ public class Strategie {
 		tabPallet = cam.getPalets();
 		tabRobot = cam.getRobots();
 		calibration();
-
-		
-		
 	}
 	
+	// Permet de ramener le premier palet dans les cages
 	public void ramenerPremierPalet(){
 		miseAJour();
+		// Position du robot
 		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
+		// Decalage du robot pour esquiver les palets
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
+		// Destination vers les cages
 		Point dest = new Point(tabRobot[indiceRobot][x]+delta, 150);
 		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos,dest);
@@ -97,6 +102,7 @@ public class Strategie {
 		dest.move(tabRobot[indiceRobot][x], yCage);
 		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos, dest);
+		// Tant qu'on a pas traverse la ligne blanche
 		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
 			moteurs.avancer();
 			while(!capteur.getCurrentColor().equals(Couleur.blanc) && ((Math.abs(tabRobot[indiceAdverse][x] - tabRobot[indiceRobot][x]) > 20)  || (Math.abs(tabRobot[indiceAdverse][y] - tabRobot[indiceRobot][y]) > 40))){
@@ -221,7 +227,7 @@ public class Strategie {
 				double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
 				teta = Math.atan(tangenteTeta);
 			}
-			//moteurs.setAngle(teta);
+			moteurs.setAngle(teta);
 			System.arraycopy(newTabPallet, 0, tabPallet, 0, tabPallet.length);
 			System.arraycopy(newTabRobot, 0, tabRobot, 0, tabRobot.length);
 		}
