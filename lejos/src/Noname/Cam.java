@@ -2,7 +2,9 @@ package Noname;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import lejos.hardware.Button;
 
@@ -14,7 +16,10 @@ public class Cam implements Runnable {
 
 	private int colision;
 	private int distColision;
-
+	private Set<Integer> collisionsRobot1;
+	private Set<Integer> collisionsRobot2;
+	int[][] surveillance;
+	
 	private DatagramSocket dsocket;
 	private DatagramPacket packet;
 	private byte[] buffer;
@@ -23,7 +28,16 @@ public class Cam implements Runnable {
 		robots = new int[2][3];
 		colision = 0;
 		distColision = 15;
-
+		collisionsRobot1 = new HashSet<>();
+		collisionsRobot2 = new HashSet<>();
+		surveillance = new int[11][4];
+		for(int i=0;i<surveillance.length;i++){
+			surveillance[i][0] = 0; // 1 si surveillé; 0 si non surveillé
+			surveillance[i][1] = 0; // distance parcourue pendant la surveillance
+			surveillance[i][2] = 0; // nombre de mesures de distance enregistrées.
+			surveillance[i][3] = 0; // index de l'objet avec lequel il est en collision.
+			
+		}
 		init();
 	}
 
@@ -207,8 +221,8 @@ public class Cam implements Runnable {
 					// y + " - palets: i:" + palets[j][0] + " "
 					// + palets[j][1] + "/" + palets[j][2]);
 					// System.out.println(affichePalets());
-
-					colision++;
+					System.out.println("COLLISIONNNNNNNN  PALET" + i + " " + j);
+					
 					tabColisions[j][i] = true;
 				} else {
 					// System.out.println("palets pas colision: "+current);
@@ -237,6 +251,8 @@ public class Cam implements Runnable {
 					// y + " - robots: i:" + robots[j][0] + " "
 					// + robots[j][1] + "/" + robots[j][2]);
 					// System.out.println(afficheRobots());
+					System.out.println("COLLISIONNNNNNNN  ROBOT" + i + " " + j);
+
 					colision++;
 					tabColisions[palets.length + j][i] = true;
 				} else {
@@ -251,7 +267,26 @@ public class Cam implements Runnable {
 			}
 
 			if (estRobot) {
-				//System.out.println("Actualise Robot" + "" );
+				// System.out.println("Actualise Robot" + "" );
+				if(surveillance[indexMax + 9][0] == 1){ // si cet index est sous surveillance
+					if(surveillance[indexMax + 9][2] > 0){ // si on est pas au bout de cette surveillance, on actualise les distances
+						surveillance[indexMax + 9][2]--;
+
+						surveillance[indexMax + 9][1] += Math.floor(Math.sqrt((x - robots[indexMax][1]) * (x - robots[indexMax][1]) + (y - robots[indexMax][2]) * (y - robots[indexMax][2])));
+					}else{
+						// mettre les objets qui étaient en collision dans le bon tableau
+						int indexCollision = surveillance[indexMax + 9][3];
+						if(surveillance[indexMax + 9][1] > surveillance[indexCollision][1]){
+							System.out.println("ROBOT > PALET ");
+						}else{
+							System.out.println("ROBOT < PALET ");
+
+						}
+
+						// arreter la surveillance?
+
+					}
+				}
 				robots[indexMax][0] = index;
 				robots[indexMax][1] = x;
 				robots[indexMax][2] = y;
@@ -259,8 +294,24 @@ public class Cam implements Runnable {
 				brobots[indexMax] = true;
 
 			} else {
-				//System.out.println("Actualise Palet");
+				// System.out.println("Actualise Palet");
+				if(surveillance[indexMax][0] == 1){ // si cet index est sous surveillance
+					if(surveillance[indexMax][2] > 0){ // si on est pas au bout de cette surveillance, on actualise les distances
+						surveillance[indexMax][2]--;
+						surveillance[indexMax][1] += Math.floor(Math.sqrt((x - palets[indexMax][1]) * (x - palets[indexMax][1]) + (y - palets[indexMax][2]) * (y - palets[indexMax][2])));
+					}else{
+						// mettre les objets qui étaient en collision dans le bon tableau
+						int indexCollision = surveillance[indexMax][3];
+						if(surveillance[indexMax][1] > surveillance[indexCollision][1]){
+							System.out.println("ROBOT < PALET ");
+						}else{
+							System.out.println("ROBOT > PALET ");
+						}
 
+						// arreter la surveillance?
+
+					}
+				}
 				palets[indexMax][0] = index;
 				palets[indexMax][1] = x;
 				palets[indexMax][2] = y;
@@ -273,13 +324,88 @@ public class Cam implements Runnable {
 
 		}
 
-		if (colision > 11) {
-			// System.out.println("COLISION! " + colision);
-			// System.out.println("palets:\n" + affichePalets());
-			// System.out.println("robots:\n" + afficheRobots());
-			// System.out.println("robots:\n" + afficheColisions());
+		int robot1 = 9;
+		int robot2 = 10;
+		Set<Integer> newcollisionsRobot1 = new HashSet<>();
+		Set<Integer> newcollisionsRobot2 = new HashSet<>();
+		for (int i = 0; i < tabColisions.length; i++) {
+			if (tabColisions[robot1][i]) {
+				for (int j = 0; j < tabColisions.length; j++) {
+					if (tabColisions[j][i] && j != robot1) {
+						// colision robot1 et j
+						newcollisionsRobot1.add(j);
+					}
+				}
+			}
 
-			// pressAnyKeyToContinue();
+			if (tabColisions[robot2][i]) {
+				for (int j = 0; j < tabColisions.length; j++) {
+					if (tabColisions[j][i] && j != robot2) {
+						// colision robot2 et j
+						newcollisionsRobot2.add(j);
+					}
+				}
+			}
+
+		}
+		
+		// donner le même x/y au palet en collision avec un robot
+		for(Integer pal : collisionsRobot1){
+			palets[pal][0] = robots[0][0];
+			palets[pal][1] = robots[0][1];
+			palets[pal][2] = robots[0][2];
+		}
+		
+		for(Integer pal : collisionsRobot2){
+			palets[pal][0] = robots[1][0];
+			palets[pal][1] = robots[1][1];
+			palets[pal][2] = robots[1][2];
+		}
+		
+		int nbMesures = 50;
+		for(Integer pal : newcollisionsRobot1){
+			if(!collisionsRobot1.contains(pal)){
+				// on sort de collision!
+				// surveiller les distances parcourues par les 2 objets				
+				// celui qui a parcouru le plus de distance en 5 (a ajuster) mesures sera considéré comme le robot
+
+				surveillance[robot1][0] = 1;
+				surveillance[robot1][1] = 0;
+				surveillance[robot1][2] = nbMesures;
+				surveillance[robot1][3] = pal;
+				
+				
+				surveillance[pal][0] = 1;
+				surveillance[pal][1] = 0;
+				surveillance[pal][2] = nbMesures;
+				surveillance[pal][3] = robot1;
+				
+				// retirer le palet de la liste des collisions avec le robot
+				collisionsRobot1.remove(pal);
+			}
+		}
+		
+		
+		for(Integer pal : newcollisionsRobot2){
+			if(!collisionsRobot2.contains(pal)){
+				// on sort de collision!
+				// surveiller les distances parcourues par les 2 objets				
+				// celui qui a parcouru le plus de distance en 5 (a ajuster) mesures sera considéré comme le robot
+
+				surveillance[robot2][0] = 1;
+				surveillance[robot2][1] = 0;
+				surveillance[robot2][2] = nbMesures;
+				surveillance[robot2][3] = pal;
+
+				surveillance[pal][0] = 1;
+				surveillance[pal][1] = 0;
+				surveillance[pal][2] = nbMesures;
+				surveillance[pal][3] = robot2;
+
+				
+				// retirer le palet de la liste des collisions avec le robot
+				collisionsRobot2.remove(pal);
+			}
 		}
 
 	}
@@ -325,6 +451,21 @@ public class Cam implements Runnable {
 		return buff;
 	}
 
+	public String afficheSurveillance() {
+		String buff = "";
+		for (int i = 0; i < surveillance.length; i++) {
+			buff += "i:"+i;
+			buff += " surv? " + surveillance[i][0]; // 1 si surveillé; 0 si non surveillé
+			buff += " dist: " + surveillance[i][1]; // distance parcourue pendant la surveillance
+			buff += " mesures: " + surveillance[i][2]; // nombre de mesures de distance enregistrées.
+			buff += " collision avec " + surveillance[i][3]; // index de l'objet avec lequel il est en collision.
+			buff += "\n";
+		}
+		return buff;
+	}
+	
+	
+	
 	public String afficheRobots() {
 		String buff = "";
 		for (int i = 0; i < robots.length; i++) {
@@ -346,7 +487,7 @@ public class Cam implements Runnable {
 
 	@Override
 	public void run() {
-	
+		int toto = 0;
 		int port = 8888;
 		try {
 			// Create a socket to listen on the port.
@@ -360,16 +501,22 @@ public class Cam implements Runnable {
 			// Create a packet to receive data into the buffer
 			//DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			while (true) {
-				dsocket.receive(packet);
-
+				dsocket.receive(packet);				
+				
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, packet.getLength());
-				// System.out.println(packet.getAddress().getHostName() + ": "
-				// + msg);
+				System.out.println("------------debut "+ toto + "--------------");
+				//System.out.println(msg);
+			
 				MajCoords(msg);
+				//System.out.println(affichePalets());
+				//System.out.println(afficheRobots());
+				System.out.println(afficheSurveillance());
+				System.out.println(afficheColisions());
+				System.out.println("---------------fin------------------");
 				packet.setLength(buffer.length);
-				//Thread.sleep(500);
-
+				// Thread.sleep(500);
+				toto++;
 			}
 		} catch (Exception e) {
 			System.out.println(e);
