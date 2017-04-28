@@ -91,12 +91,16 @@ public class Strategie {
 		// Decalage du robot pour esquiver les palets
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
 		// Destination vers les cages
-		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
+		Point dest = new Point(tabRobot[indiceRobot][x]+delta, 150);
+		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos,dest);
-		// Etape de mise a jour des positions des robots
+		moteurs.avancer();
+		Delay.msDelay(1000);
+		moteurs.arreter();
 		miseAJour();
 		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		dest.move(tabRobot[indiceRobot][x], yCage);
+		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos, dest);
 		// Tant qu'on a pas traverse la ligne blanche
 		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
@@ -107,6 +111,7 @@ public class Strategie {
 			}
 			moteurs.arreter();
 		}
+		pince.ouvrirPince();
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
@@ -207,8 +212,7 @@ public class Strategie {
 	public void miseAJour() {
 		int[][] newTabPallet = cam.getPalets();
 		int[][] newTabRobot = cam.getRobots();
-		System.out.println(newTabPallet.toString());
-		System.out.println(tabPallet.toString());
+		afficherTableaux();
 		
 		if((Math.abs(newTabPallet[indiceRobot][x] - tabPallet[indiceRobot][x]) < 10) || (Math.abs(newTabPallet[indiceRobot][y] - tabPallet[indiceRobot][y]) < 10)){
 			double teta = 0;
