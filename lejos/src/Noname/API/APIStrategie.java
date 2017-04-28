@@ -27,21 +27,41 @@ public interface APIStrategie {
 	public void seDirigerVers(Point positionRobot, Point destination);
 	
 	/**
-	 * permet 
-	 * @return le palet le plus proche du robot
+	 * Permet de detecter le palet le plus proche du robot
+	 * @return les coordonnees du palet le plus proche de notre robot
 	 */
 	public Point detecterPlusProchePallet();
 	
+	/**
+	 * Avance jusqu'au palet et le prend en pince
+	 * @param pallet
+	 * @return vrai si le bouton poussoir est presse, faux sinon
+	 */
 	public boolean allerChercherPallet(Point pallet);
 	
+	/**
+	 *  Met a jour les tableau palet et robot et l'angle
+	 */
 	public void miseAJour();
 	
+	/**
+	 * Ramene le palet dans les cages
+	 */
 	public void rentrerALaMaison();
 	
+	/**
+	 * Lance la camera sur un thread
+	 */
 	public void lancerCam();
 	
+	/**
+	 * Permet d'afficher les tableaux de coordonnees des palets
+	 */
 	public void afficherTableaux();
 	
+	/**
+	 * Machine a etats permettant de gerer le chemin, la gestion de la pince de l'acquisition d'un palet dans les cages
+	 */
 	public void run();
 	
 }
