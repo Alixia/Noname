@@ -86,11 +86,16 @@ public class Strategie {
 		miseAJour();
 		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -15 : 15;
-		Point dest = new Point(tabRobot[indiceRobot][x]+delta, yCage);
+		Point dest = new Point(tabRobot[indiceRobot][x]+delta, 150);
+		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos,dest);
+		moteurs.avancer();
+		Delay.msDelay(1000);
+		moteurs.arreter();
 		miseAJour();
 		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		dest.move(tabRobot[indiceRobot][x], yCage);
+		System.out.println(dest + "   " + pos);
 		seDirigerVers(pos, dest);
 		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
 			moteurs.avancer();
@@ -100,6 +105,7 @@ public class Strategie {
 			}
 			moteurs.arreter();
 		}
+		pince.ouvrirPince();
 	}
 
 	public void seDirigerVers(Point positionRobot, Point destination) {
@@ -200,8 +206,7 @@ public class Strategie {
 	public void miseAJour() {
 		int[][] newTabPallet = cam.getPalets();
 		int[][] newTabRobot = cam.getRobots();
-		System.out.println(newTabPallet.toString());
-		System.out.println(tabPallet.toString());
+		afficherTableaux();
 		
 		if((Math.abs(newTabPallet[indiceRobot][x] - tabPallet[indiceRobot][x]) < 10) || (Math.abs(newTabPallet[indiceRobot][y] - tabPallet[indiceRobot][y]) < 10)){
 			double teta = 0;
@@ -216,7 +221,7 @@ public class Strategie {
 				double tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x]) / (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
 				teta = Math.atan(tangenteTeta);
 			}
-			moteurs.setAngle(teta);
+			//moteurs.setAngle(teta);
 			System.arraycopy(newTabPallet, 0, tabPallet, 0, tabPallet.length);
 			System.arraycopy(newTabRobot, 0, tabRobot, 0, tabRobot.length);
 		}
