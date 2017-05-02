@@ -19,10 +19,11 @@ public class Cam implements Runnable {
 	private Set<Integer> collisionsRobot1;
 	private Set<Integer> collisionsRobot2;
 	int[][] surveillance;
-	
+
 	private DatagramSocket dsocket;
 	private DatagramPacket packet;
 	private byte[] buffer;
+
 	public Cam() {
 		palets = new int[9][3];
 		robots = new int[2][3];
@@ -31,12 +32,15 @@ public class Cam implements Runnable {
 		collisionsRobot1 = new HashSet<>();
 		collisionsRobot2 = new HashSet<>();
 		surveillance = new int[11][4];
-		for(int i=0;i<surveillance.length;i++){
+		for (int i = 0; i < surveillance.length; i++) {
 			surveillance[i][0] = 0; // 1 si surveillé; 0 si non surveillé
-			surveillance[i][1] = 0; // distance parcourue pendant la surveillance
-			surveillance[i][2] = 0; // nombre de mesures de distance enregistrées.
-			surveillance[i][3] = 0; // index de l'objet avec lequel il est en collision.
-			
+			surveillance[i][1] = 0; // distance parcourue pendant la
+									// surveillance
+			surveillance[i][2] = 0; // nombre de mesures de distance
+									// enregistrées.
+			surveillance[i][3] = 0; // index de l'objet avec lequel il est en
+									// collision.
+
 		}
 		init();
 	}
@@ -49,7 +53,6 @@ public class Cam implements Runnable {
 
 		init();
 	}
-	
 
 	private String changeMsg(String msg) {
 		// String msg =
@@ -108,47 +111,45 @@ public class Cam implements Runnable {
 			int indexMax = 0;
 			int ymin = 500;
 			int xmin = 500;
-			
+
 			int ymax = 0;
 			int xmax = 0;
-			
-			
+
 			for (int i = 0; i < buff.length; i++) {
 				String[] coord = buff[i].split(";");
 				int x = Integer.parseInt(coord[1]);
 				int y = Integer.parseInt(coord[2]);
 				int index = Integer.parseInt(coord[0]);
 
-				if(y < ymin){
+				if (y < ymin) {
 					ymin = y;
 					xmin = x;
-					indexMin=index;
+					indexMin = index;
 				}
-				
-				if(y > ymax ){
-					ymax=y;
-					xmax=x;
-					indexMax=index;
+
+				if (y > ymax) {
+					ymax = y;
+					xmax = x;
+					indexMax = index;
 				}
-				
+
 			}
-			
+
 			robots[0][0] = indexMin;
 			robots[0][1] = xmin;
 			robots[0][2] = ymin;
-			
+
 			robots[1][0] = indexMax;
 			robots[1][1] = xmax;
 			robots[1][2] = ymax;
-			
-			
+
 			for (int i = 0; i < buff.length; i++) {
 				String[] coord = buff[i].split(";");
 				int x = Integer.parseInt(coord[1]);
 				int y = Integer.parseInt(coord[2]);
 				int index = Integer.parseInt(coord[0]);
 
-				if (index != robots[0][0] && index != robots[1][0]){
+				if (index != robots[0][0] && index != robots[1][0]) {
 					palets[ipalet][0] = index;
 					palets[ipalet][1] = x;
 					palets[ipalet][2] = y;
@@ -158,12 +159,10 @@ public class Cam implements Runnable {
 				// System.out.println(Integer.toString(index) + ":" +
 				// Integer.toString(x) + " / " + Integer.toString(y));
 			}
-			
 
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
 
 	}
 
@@ -189,13 +188,12 @@ public class Cam implements Runnable {
 			brobots[i] = false;
 		}
 
-			String[] buff = msg.split("\n");
+		String[] buff = msg.split("\n");
 
 		int irobot = 0;
 		int ipalet = 0;
 		// System.out.println("nbre donnees reçues: " + buff.length);
 		for (int i = 0; i < buff.length; i++) {
-
 
 			String[] coord = buff[i].split(";");
 			int x = Integer.parseInt(coord[1]);
@@ -222,7 +220,7 @@ public class Cam implements Runnable {
 					// + palets[j][1] + "/" + palets[j][2]);
 					// System.out.println(affichePalets());
 					System.out.println("COLLISIONNNNNNNN  PALET" + i + " " + j);
-					
+
 					tabColisions[j][i] = true;
 				} else {
 					// System.out.println("palets pas colision: "+current);
@@ -267,56 +265,113 @@ public class Cam implements Runnable {
 			}
 
 			if (estRobot) {
-				// System.out.println("Actualise Robot" + "" );
-				if(surveillance[indexMax + 9][0] == 1){ // si cet index est sous surveillance
-					if(surveillance[indexMax + 9][2] > 0){ // si on est pas au bout de cette surveillance, on actualise les distances
+				// si cet index est sous surveillance
+				if (surveillance[indexMax + 9][0] == 1) {
+					// si on est pas au bout de cette surveillance, on actualise
+					// les distances
+					if (surveillance[indexMax + 9][2] > 0) {
 						surveillance[indexMax + 9][2]--;
-
-						surveillance[indexMax + 9][1] += Math.floor(Math.sqrt((x - robots[indexMax][1]) * (x - robots[indexMax][1]) + (y - robots[indexMax][2]) * (y - robots[indexMax][2])));
-					}else{
-						// mettre les objets qui étaient en collision dans le bon tableau
+						surveillance[indexMax + 9][1] += Math
+								.floor(Math.sqrt((x - robots[indexMax][1]) * (x - robots[indexMax][1])
+										+ (y - robots[indexMax][2]) * (y - robots[indexMax][2])));
+					} else {
+						// mettre les objets qui étaient en collision dans le
+						// bon tableau
 						int indexCollision = surveillance[indexMax + 9][3];
-						if(surveillance[indexMax + 9][1] > surveillance[indexCollision][1]){
+
+						// un palet est entré avec un robot qui été déjà en
+						// collision
+						if (indexCollision != surveillance[indexCollision][3]) {
+							System.out.println("JE SUIS UN PALET (dans robot)");
+							palets[indexMax][0] = index;
+							palets[indexMax][1] = x;
+							palets[indexMax][2] = y;
+
+							bpalets[indexMax] = true;
+							surveillance[indexMax + 9][0] = 0;
+
+						} else if (surveillance[indexMax + 9][1] > surveillance[indexCollision][1]) {
 							System.out.println("ROBOT > PALET ");
-						}else{
+							robots[indexMax][0] = index;
+							robots[indexMax][1] = x;
+							robots[indexMax][2] = y;
+
+							brobots[indexMax] = true;
+							surveillance[indexMax + 9][0] = 0;
+						} else {
 							System.out.println("ROBOT < PALET ");
+							palets[indexCollision][0] = index;
+							palets[indexCollision][1] = x;
+							palets[indexCollision][2] = y;
+
+							bpalets[indexCollision] = true;
+							surveillance[indexMax + 9][0] = 0;
 
 						}
-
-						// arreter la surveillance?
-
 					}
-				}
-				robots[indexMax][0] = index;
-				robots[indexMax][1] = x;
-				robots[indexMax][2] = y;
+				} else {
+					robots[indexMax][0] = index;
+					robots[indexMax][1] = x;
+					robots[indexMax][2] = y;
 
-				brobots[indexMax] = true;
+					brobots[indexMax] = true;
+				}
 
 			} else {
-				// System.out.println("Actualise Palet");
-				if(surveillance[indexMax][0] == 1){ // si cet index est sous surveillance
-					if(surveillance[indexMax][2] > 0){ // si on est pas au bout de cette surveillance, on actualise les distances
+				// si cet index est sous surveillance
+				if (surveillance[indexMax][0] == 1) {
+					// si on est pas au bout de cette surveillance, on actualise
+					// les distances
+					if (surveillance[indexMax][2] > 0) {
 						surveillance[indexMax][2]--;
-						surveillance[indexMax][1] += Math.floor(Math.sqrt((x - palets[indexMax][1]) * (x - palets[indexMax][1]) + (y - palets[indexMax][2]) * (y - palets[indexMax][2])));
-					}else{
-						// mettre les objets qui étaient en collision dans le bon tableau
+						surveillance[indexMax][1] += Math
+								.floor(Math.sqrt((x - palets[indexMax][1]) * (x - palets[indexMax][1])
+										+ (y - palets[indexMax][2]) * (y - palets[indexMax][2])));
+					} else {
+						// mettre les objets qui étaient en collision dans le
+						// bon tableau
 						int indexCollision = surveillance[indexMax][3];
-						if(surveillance[indexMax][1] > surveillance[indexCollision][1]){
+
+						// un palet est entré avec un robot qui été déjà en
+						// collision
+						if (indexCollision != surveillance[indexCollision][3]) {
+						//if (indexCollision != surveillance[indexCollision +9][3]) { // pas sur de l'indice...
+
+							System.out.println("JE SUIS UN PALET (dans palet)");
+							palets[indexMax][0] = index;
+							palets[indexMax][1] = x;
+							palets[indexMax][2] = y;
+
+							bpalets[indexMax] = true;
+							surveillance[indexMax][0] = 0;
+
+						} else if (surveillance[indexMax][1] > surveillance[indexCollision + 9][1]) {
 							System.out.println("ROBOT < PALET ");
-						}else{
+							robots[indexCollision][0] = index;
+							robots[indexCollision][1] = x;
+							robots[indexCollision][2] = y;
+
+							brobots[indexCollision] = true;
+							surveillance[indexCollision + 9][0] = 0;
+
+						} else {
 							System.out.println("ROBOT > PALET ");
+							palets[indexMax][0] = index;
+							palets[indexMax][1] = x;
+							palets[indexMax][2] = y;
+
+							bpalets[indexMax] = true;
+							surveillance[indexMax][0] = 0;
 						}
 
-						// arreter la surveillance?
-
 					}
-				}
-				palets[indexMax][0] = index;
-				palets[indexMax][1] = x;
-				palets[indexMax][2] = y;
+				} else {
+					palets[indexMax][0] = index;
+					palets[indexMax][1] = x;
+					palets[indexMax][2] = y;
 
-				bpalets[indexMax] = true;
+					bpalets[indexMax] = true;
+				}
 
 			}
 
@@ -348,61 +403,67 @@ public class Cam implements Runnable {
 			}
 
 		}
-		
+
 		// donner le même x/y au palet en collision avec un robot
-		for(Integer pal : collisionsRobot1){
+		for (Integer pal : collisionsRobot1) {
 			palets[pal][0] = robots[0][0];
 			palets[pal][1] = robots[0][1];
 			palets[pal][2] = robots[0][2];
 		}
-		
-		for(Integer pal : collisionsRobot2){
+
+		for (Integer pal : collisionsRobot2) {
 			palets[pal][0] = robots[1][0];
 			palets[pal][1] = robots[1][1];
 			palets[pal][2] = robots[1][2];
 		}
-		
-		int nbMesures = 50;
-		for(Integer pal : newcollisionsRobot1){
-			if(!collisionsRobot1.contains(pal)){
-				// on sort de collision!
-				// surveiller les distances parcourues par les 2 objets				
-				// celui qui a parcouru le plus de distance en 5 (a ajuster) mesures sera considéré comme le robot
 
-				surveillance[robot1][0] = 1;
-				surveillance[robot1][1] = 0;
-				surveillance[robot1][2] = nbMesures;
-				surveillance[robot1][3] = pal;
-				
-				
+		int nbMesures = 10;
+		for (Integer pal : newcollisionsRobot1) {
+			if (!collisionsRobot1.contains(pal)) {
+				// on sort de collision!
+				// surveiller les distances parcourues par les 2 objets
+				// celui qui a parcouru le plus de distance en 5 (a ajuster)
+				// mesures sera considéré comme le robot
+
+				// le robot ne surveille qu'un seul palet, les palets qui
+				// entrent en collision avec lui alors qu'il est déjà en
+				// collision sont traités comme des palets.
+				if (surveillance[robot1][0] == 0) {
+					surveillance[robot1][0] = 1;
+					surveillance[robot1][1] = 0;
+					surveillance[robot1][2] = nbMesures;
+					surveillance[robot1][3] = pal;
+				}
 				surveillance[pal][0] = 1;
 				surveillance[pal][1] = 0;
 				surveillance[pal][2] = nbMesures;
 				surveillance[pal][3] = robot1;
-				
+
 				// retirer le palet de la liste des collisions avec le robot
 				collisionsRobot1.remove(pal);
 			}
 		}
-		
-		
-		for(Integer pal : newcollisionsRobot2){
-			if(!collisionsRobot2.contains(pal)){
+
+		for (Integer pal : newcollisionsRobot2) {
+			if (!collisionsRobot2.contains(pal)) {
 				// on sort de collision!
-				// surveiller les distances parcourues par les 2 objets				
-				// celui qui a parcouru le plus de distance en 5 (a ajuster) mesures sera considéré comme le robot
-
-				surveillance[robot2][0] = 1;
-				surveillance[robot2][1] = 0;
-				surveillance[robot2][2] = nbMesures;
-				surveillance[robot2][3] = pal;
-
+				// surveiller les distances parcourues par les 2 objets
+				// celui qui a parcouru le plus de distance en 5 (a ajuster)
+				// mesures sera considéré comme le robot
+				// le robot ne surveille qu'un seul palet, les palets qui
+				// entrent en collision avec lui alors qu'il est déjà en
+				// collision sont traités comme des palets.
+				if (surveillance[robot2][0] == 0) {
+					surveillance[robot2][0] = 1;
+					surveillance[robot2][1] = 0;
+					surveillance[robot2][2] = nbMesures;
+					surveillance[robot2][3] = pal;
+				}
 				surveillance[pal][0] = 1;
 				surveillance[pal][1] = 0;
 				surveillance[pal][2] = nbMesures;
 				surveillance[pal][3] = robot2;
 
-				
 				// retirer le palet de la liste des collisions avec le robot
 				collisionsRobot2.remove(pal);
 			}
@@ -454,18 +515,23 @@ public class Cam implements Runnable {
 	public String afficheSurveillance() {
 		String buff = "";
 		for (int i = 0; i < surveillance.length; i++) {
-			buff += "i:"+i;
-			buff += " surv? " + surveillance[i][0]; // 1 si surveillé; 0 si non surveillé
-			buff += " dist: " + surveillance[i][1]; // distance parcourue pendant la surveillance
-			buff += " mesures: " + surveillance[i][2]; // nombre de mesures de distance enregistrées.
-			buff += " collision avec " + surveillance[i][3]; // index de l'objet avec lequel il est en collision.
+			buff += "i:" + i;
+			buff += " surv? " + surveillance[i][0]; // 1 si surveillé; 0 si non
+													// surveillé
+			buff += " dist: " + surveillance[i][1]; // distance parcourue
+													// pendant la surveillance
+			buff += " mesures: " + surveillance[i][2]; // nombre de mesures de
+														// distance
+														// enregistrées.
+			buff += " collision avec " + surveillance[i][3]; // index de l'objet
+																// avec lequel
+																// il est en
+																// collision.
 			buff += "\n";
 		}
 		return buff;
 	}
-	
-	
-	
+
 	public String afficheRobots() {
 		String buff = "";
 		for (int i = 0; i < robots.length; i++) {
@@ -479,10 +545,10 @@ public class Cam implements Runnable {
 
 		int ok = 0;
 		int ko = 0;
-			Cam c = new Cam();
-			Thread t = new Thread(c);
-			t.run();			
-	
+		Cam c = new Cam();
+		Thread t = new Thread(c);
+		t.run();
+
 	}
 
 	@Override
@@ -491,26 +557,27 @@ public class Cam implements Runnable {
 		int port = 8888;
 		try {
 			// Create a socket to listen on the port.
-			//DatagramSocket dsocket = new DatagramSocket(port);
+			// DatagramSocket dsocket = new DatagramSocket(port);
 
 			// Create a buffer to read datagrams into. If a
 			// packet is larger than this buffer, the
 			// excess will simply be discarded!
-			//byte[] buffer = new byte[2048];
+			// byte[] buffer = new byte[2048];
 
 			// Create a packet to receive data into the buffer
-			//DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			// DatagramPacket packet = new DatagramPacket(buffer,
+			// buffer.length);
 			while (true) {
-				dsocket.receive(packet);				
-				
+				dsocket.receive(packet);
+
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, packet.getLength());
-				System.out.println("------------debut "+ toto + "--------------");
-				//System.out.println(msg);
-			
+				System.out.println("------------debut " + toto + "--------------");
+				// System.out.println(msg);
+
 				MajCoords(msg);
-				//System.out.println(affichePalets());
-				//System.out.println(afficheRobots());
+				// System.out.println(affichePalets());
+				// System.out.println(afficheRobots());
 				System.out.println(afficheSurveillance());
 				System.out.println(afficheColisions());
 				System.out.println("---------------fin------------------");
