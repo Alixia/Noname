@@ -21,5 +21,17 @@ public class Surveillance {
 		
 	}
 	
+	@Override
+	public String toString() {
+		String buff = "";
+		buff += " index:" + index;
+		buff += " surv? " + estSurveille;
+		buff += " dist: " + distance;
+		buff += " mesures: " + mesure;
+		buff += " collision avec " + indexCollision;
+		buff += " pos: "+  posX + " / " + posY;
+		buff += "\n";
+		return buff;
+	}
 	
 }
