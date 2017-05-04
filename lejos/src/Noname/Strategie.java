@@ -28,7 +28,7 @@ public class Strategie implements APIStrategie{
 	private int yCage;
 	private int yMin;
 	private int yMax;
-	public Cam cam;
+	public Camera cam;
 	private Thread ThreadCam;
 	public Strategie(Capteurs ca, Moteurs m, Pince p) {
 		this.capteur = ca;
@@ -37,7 +37,7 @@ public class Strategie implements APIStrategie{
 		etat = MachineEtat.NOPALLET;
 
 		System.out.println("debut thread");
-		cam = new Cam();
+		cam = new Camera();
 		
 		System.out.println("debut cam");
 		ThreadCam = new Thread(cam);

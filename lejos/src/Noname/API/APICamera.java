@@ -1,6 +1,6 @@
 package Noname.API;
 
-public interface APICam {
+public interface APICamera {
 
 	/**
 	 * mais à jour les tableaux palets et robot à partir des informations contenu dans msg
