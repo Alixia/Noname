@@ -58,8 +58,6 @@ public class Camera implements Runnable, APICamera {
 				indiceRobots[i - nbPalets] = i;
 			}
 		}
-		System.out.println("indice robot 0 : " + indiceRobots[0]);
-		System.out.println("indice robot 1 : " + indiceRobots[1]);
 		collisionsRobot1 = new HashSet<>();
 		collisionsRobot2 = new HashSet<>();
 		surveillance = new Surveillance[nbPalets + nbRobots];
@@ -222,15 +220,8 @@ public class Camera implements Runnable, APICamera {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, dPacket.getLength());
-				System.out.println("------------debut " + iter + "--------------");
-				// System.out.println(msg);
 
 				MAJCoords(msg);
-				
-				System.out.println(afficheElements());
-				//System.out.println(afficheSurveillance());
-				//System.out.println(afficheCollisions());
-				System.out.println("---------------fin------------------");
 				dPacket.setLength(buffer.length);
 				// Thread.sleep(500);
 				iter++;
@@ -274,7 +265,6 @@ public class Camera implements Runnable, APICamera {
 				int diffX = buffer[currentElt][X] - tabElements[i][X];
 				int diffY = buffer[currentElt][Y] - tabElements[i][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;
@@ -286,7 +276,6 @@ public class Camera implements Runnable, APICamera {
 			buffer[indexMinDistance][INDICE]++;
 
 		}
-		System.out.println(this.afficheElements());
 		
 		
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
@@ -333,10 +322,8 @@ public class Camera implements Runnable, APICamera {
 		
 		for(int indexMinDistance = 0 ; indexMinDistance < surveillance.length; indexMinDistance++){
 			if (surveillance[indexMinDistance].estSurveille) {
-				System.out.println(2 + " : surveille = " + surveillance[indexMinDistance].toString());
 				// Si le compteur n'est pas fini
 				if (surveillance[indexMinDistance].mesure > 0) {
-					System.out.println(3 + " : surveille = " + surveillance[indexMinDistance].toString());
 					surveillance[indexMinDistance].mesure--;
 				} else { // Gestion des objets en collision
 					
@@ -356,16 +343,11 @@ public class Camera implements Runnable, APICamera {
 					diffY = posY - tabElements[indexCollision][Y];
 					surveillance[indexCollision].distance += Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
 					
-					System.out.println(4 + " : surveille = " + surveillance[indexMinDistance].toString());
-					
 					if(surveillance[monIndex].distance == surveillance[indexCollision].distance){
-						System.out.println(9 + " : surveille = " + surveillance[monIndex].toString());
 						surveillance[monIndex].mesure++;
 					}
 					else if (((surveillance[monIndex].distance < surveillance[indexCollision].distance) == estRobot(monIndex))) {
-							System.out.println(5 + " : surveille = " + surveillance[indexMinDistance].toString());
-							System.out.println("(p)ROBOT < PALET " + "ic=" + indexCollision + "im=" + indexMinDistance);
-
+					
 							int tempX = tabElements[monIndex][X];
 							int tempY = tabElements[monIndex][Y];
 							tabElements[monIndex][X] = tabElements[indexCollision][X];

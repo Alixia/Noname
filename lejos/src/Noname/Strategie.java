@@ -35,14 +35,8 @@ public class Strategie implements APIStrategie{
 		this.moteurs = m;
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
-
-		System.out.println("debut thread");
 		cam = new Camera();
-		
-		System.out.println("debut cam");
 		ThreadCam = new Thread(cam);
-	
-		System.out.println("debut init");
 		intialisation();
 	}
 	
@@ -80,12 +74,10 @@ public class Strategie implements APIStrategie{
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("lancer cam");
 		lancerCam();
 		
 		tabPallet = cam.getPalets();
 		tabRobot = cam.getRobots();
-		System.out.println("calibration");
 		calibration();
 	}
 	
@@ -98,7 +90,6 @@ public class Strategie implements APIStrategie{
 		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x])? -25 : 25;
 		// Destination vers les cages
 		Point dest = new Point(tabRobot[indiceRobot][x]+delta, tabRobot[indiceRobot][y]);
-		System.out.println("dest : " + dest + "     pos : " + pos+  "     angle : " + moteurs.getAngle());
 		seDirigerVers(pos,dest);
 		moteurs.avancer();
 		Delay.msDelay(1200);
@@ -106,7 +97,6 @@ public class Strategie implements APIStrategie{
 		miseAJour();
 		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		dest.move(tabRobot[indiceRobot][x], yCage);
-		System.out.println(dest + "   " + pos + "     angle : " + moteurs.getAngle());
 		seDirigerVers(pos, dest);
 		// Tant qu'on a pas traverse la ligne blanche
 		boolean enCours = true;
@@ -173,6 +163,7 @@ public class Strategie implements APIStrategie{
 
 	public Point detecterPlusProchePallet() {
 		int indicePalletPlusProche = 0;
+		boolean trouver = false;
 		double distancePrec = 5000;
 		for (int i = 0; i < tabPallet.length; i++) {
 			if ((tabPallet[i][y] > yMin + 15) && (tabPallet[i][y] < yMax - 15)) {
@@ -181,10 +172,16 @@ public class Strategie implements APIStrategie{
 				if (distancePrec > distanceEnCours) {
 					indicePalletPlusProche = i;
 					distancePrec = distanceEnCours;
+					trouver = true;
 				}
 			}
 		}
-		Point plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
+		
+		Point plusProche = new Point(-1, -1);
+		
+		if(trouver){
+			plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
+		}
 		return plusProche;
 	}
 
@@ -278,17 +275,25 @@ public class Strategie implements APIStrategie{
 		
 	}
 	public void premiereEtape(){
-		allerChercherPallet(detecterPlusProchePallet());
+		Point p = detecterPlusProchePallet();
+		System.out.println(p);
+		allerChercherPallet(p);
 		ramenerPremierPalet();
 	}
 
 	public void run() {
 		Point pallet;
 		premiereEtape();
-		while (true) {
+		boolean boucle = true;
+		while (boucle) {
 			switch (etat) {
 			case NOPALLET:
 				pallet = detecterPlusProchePallet();
+				// il n'y a plus de pallet à aller chercher
+				if(pallet.x == -1){
+					boucle = false;
+					break;
+				}
 				if (allerChercherPallet(pallet)) {
 					etat = MachineEtat.PALLET;
 				}
