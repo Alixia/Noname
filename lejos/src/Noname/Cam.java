@@ -27,7 +27,7 @@ public class Cam implements Runnable {
 	
 	// GESTION DU TABLEAU D'ELEMENTS
 	final private int nbDim = 3;
-		// Les dimensions sont :
+		// Les dimensions sont :       ---------------- c'est quoi ce commentaire de merde
 	final private int INDICE = 0;
 	final private int X = 1;
 	final private int Y = 2;
@@ -82,8 +82,8 @@ public class Cam implements Runnable {
 			String[] buff = msg.split("\n");
 
 			// Indice 0 contient yMax, 1 : yMin
-			tabElements[indiceRobots[0]][Y] = 1000;
-			tabElements[indiceRobots[1]][Y] = -100;
+			tabElements[indiceRobots[0]][Y] = 500;
+			tabElements[indiceRobots[1]][Y] = 0;
 
 			for (int i = 0; i < buff.length; i++) {
 				String[] coord = buff[i].split(";");
@@ -305,8 +305,8 @@ public class Cam implements Runnable {
 				}
 			}
 			// Mettre les collisions robot courantes dans une "sauvegarde"
-			collisionsRobot1.add(currentCollisionsRobot1);
-			collisionsRobot2.add(currentCollisionsRobot2);
+			collisionsRobot1.addAll(currentCollisionsRobot1);
+			collisionsRobot2.addAll(currentCollisionsRobot2);
 			System.out.println(11 + " : surveille = " + surveillance[indexRobot].toString());
 		}
 	}
