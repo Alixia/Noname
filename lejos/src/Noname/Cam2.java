@@ -37,8 +37,11 @@ public class Cam2 implements Runnable {
 	final private int nbMesures = 15;
 	final private int distanceColision = 30;
 
+	final private int nbPal = 9;
+	final private int nbRob = 2;
+
 	// Constructeur
-	public Cam2(int nbPal, int nbRob) {
+	public Cam2() {
 		this.nbPalets = nbPal;
 		this.nbRobots = nbRob;
 		this.nbTot = nbPalets + nbRobots;
@@ -125,6 +128,26 @@ public class Cam2 implements Runnable {
 	public int[][] getElements() {
 		return tabElements;
 	}
+	
+	public int[][] getPalets(){
+		int[][] tabPalets = new int[nbPalets][nbDim];
+		for(int i=0;i<nbPalets;i++){
+			tabPalets[i][INDICE] = tabElements[i][INDICE];
+			tabPalets[i][X] = tabElements[i][X];
+			tabPalets[i][Y] = tabElements[i][Y];
+		}
+		return tabPalets;
+	}
+	
+	public int[][] getRobots(){
+		int[][] tabRobots = new int[nbRobots][nbDim];
+		for(int i=nbPalets;i<nbRobots;i++){
+			tabRobots[i][INDICE] = tabElements[i][INDICE];
+			tabRobots[i][X] = tabElements[i][X];
+			tabRobots[i][Y] = tabElements[i][Y];
+		}
+		return tabRobots;
+	}
 
 	public String afficheCollisions() {
 		String buffer = "";
@@ -172,7 +195,7 @@ public class Cam2 implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Cam2 c = new Cam2(9, 2);
+		Cam2 c = new Cam2();
 		Thread t = new Thread(c);
 		t.run();
 	}
