@@ -4,12 +4,13 @@ import java.awt.Point;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import Noname.API.APIStrategie;
 import Noname.Outils.Couleur;
 import Noname.Outils.MachineEtat;
 import lejos.hardware.Button;
 import lejos.utility.Delay;
 
-public class Strategie {
+public class Strategie implements APIStrategie{
 
 	private Capteurs capteur;
 	private Moteurs moteurs;

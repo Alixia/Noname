@@ -5,7 +5,9 @@ import java.net.DatagramSocket;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Cam implements Runnable {
+import Noname.API.APICam;
+
+public class Cam implements Runnable, APICam {
 	// GESTION DES COLLISIONS
 	private boolean[][] tabCollisions; // Tableau gerant les collisions
 	private Set<Integer> collisionsRobot1; // Collisions du robot 1
