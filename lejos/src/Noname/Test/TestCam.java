@@ -1,6 +1,6 @@
 package Noname.Test;
 
-import Noname.Cam;
+import Noname.Camera;
 import Noname.Capteurs;
 import Noname.Moteurs;
 import Noname.Pince;
@@ -27,7 +27,7 @@ public class TestCam {
 	
 
 	public static void afficherCam() {
-		Cam c = new Cam(true);
+		Camera c = new Camera();
 		Thread t = new Thread(c);
 		t.run();
 		

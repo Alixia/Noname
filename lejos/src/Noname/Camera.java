@@ -24,8 +24,6 @@ public class Camera implements Runnable, APICamera {
 	private int[][] tabElements; // Contient tous les robots et palets
 	private int[] indiceRobots; // Contient l'indice des robots
 	private int[] indicePalets; // Contient l'indice des palets
-	private int nbPalets;
-	private int nbRobots;
 	private int nbTot;
 
 	// GESTION DU TABLEAU D'ELEMENTS
@@ -39,13 +37,11 @@ public class Camera implements Runnable, APICamera {
 	final private int nbMesures = 15;
 	final private int distanceColision = 30;
 
-	final private int nbPal = 9;
-	final private int nbRob = 2;
+	final private int nbPalets = 9;
+	final private int nbRobots = 2;
 
 	// Constructeur
 	public Camera() {
-		this.nbPalets = nbPal;
-		this.nbRobots = nbRob;
 		this.nbTot = nbPalets + nbRobots;
 		this.tabElements = new int[nbTot][nbDim];
 		this.indiceRobots = new int[nbRobots];
@@ -141,10 +137,10 @@ public class Camera implements Runnable, APICamera {
 	
 	public int[][] getRobots(){
 		int[][] tabRobots = new int[nbRobots][nbDim];
-		for(int i=nbPalets;i<nbRobots;i++){
-			tabRobots[i][INDICE] = tabElements[i][INDICE];
-			tabRobots[i][X] = tabElements[i][X];
-			tabRobots[i][Y] = tabElements[i][Y];
+		for(int i=nbPalets;i<nbRobots + nbPalets;i++){
+			tabRobots[i-nbPalets][INDICE] = tabElements[i][INDICE];
+			tabRobots[i-nbPalets][X] = tabElements[i][X];
+			tabRobots[i-nbPalets][Y] = tabElements[i][Y];
 		}
 		return tabRobots;
 	}
