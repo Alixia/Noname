@@ -16,7 +16,7 @@ public class TestCam {
 		Moteurs m = new Moteurs();
 		Pince p = new Pince(true);
 		Capteurs c = new Capteurs();
-		Strategie s = new Strategie(c, m, p);
+		Strategie s = new Strategie(c, m, p, true);
 		s.lancerCam();
 		while (!Button.LEFT.isDown()) {
 			s.afficherTableaux();
