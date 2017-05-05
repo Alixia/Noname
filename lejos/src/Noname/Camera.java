@@ -138,20 +138,20 @@ public class Camera implements Runnable {
 
 	public int[][] getPalets() {
 		int[][] tabPalets = new int[nbPalets][nbDim];
-		for (int i = 0; i < nbPalets; i++) {
-			tabPalets[i][INDICE] = tabElements[i][INDICE];
-			tabPalets[i][X] = tabElements[i][X];
-			tabPalets[i][Y] = tabElements[i][Y];
+		for (int i = 0; i < indicePalets.length; i++) {
+			tabPalets[i][INDICE] = tabElements[indicePalets[i]][INDICE];
+			tabPalets[i][X] = tabElements[indicePalets[i]][X];
+			tabPalets[i][Y] = tabElements[indicePalets[i]][Y];
 		}
 		return tabPalets;
 	}
 
 	public int[][] getRobots(){
 		int[][] tabRobots = new int[nbRobots][nbDim];
-		for(int i=nbPalets;i<nbRobots + nbPalets;i++){
-			tabRobots[i-nbPalets][INDICE] = tabElements[i][INDICE];
-			tabRobots[i-nbPalets][X] = tabElements[i][X];
-			tabRobots[i-nbPalets][Y] = tabElements[i][Y];
+		for (int i = 0; i < indiceRobots.length; i++) {
+			tabRobots[i][INDICE] = tabElements[indiceRobots[i]][INDICE];
+			tabRobots[i][X] = tabElements[indiceRobots[i]][X];
+			tabRobots[i][Y] = tabElements[indiceRobots[i]][Y];
 		}
 		return tabRobots;
 	}
@@ -253,7 +253,7 @@ public class Camera implements Runnable {
 	}
 
 	private void MAJCoords(String msg) {
-//		System.out.println(afficheElements());
+		System.out.println(afficheElements());
 		boolean[] bElements = new boolean[nbTot];
 		tabCollisions = new boolean[nbTot][nbTot];
 		// Initialise toutes les collisions a faux
@@ -418,11 +418,12 @@ public class Camera implements Runnable {
 						surveillance[autreIndex].remove(s);
 						surveillance[monIndex].remove(s);
 						aEteEchange = true;
-						
+						break;
 					} else {
 						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
 						surveillance[autreIndex].remove(s);
 						surveillance[monIndex].remove(s);
+						break;
 					}
 				}
 			}

@@ -5,7 +5,7 @@ import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
 
 public enum Constantes {
-
+	
 	roueDroite(MotorPort.C), roueGauche(MotorPort.B), pince(MotorPort.A),
 	colorimetre(LocalEV3.get().getPort("S1")), boutonPoussoir(LocalEV3.get().getPort("S2")), ultrasons(LocalEV3.get().getPort("S4")),
 	demiTour(180), quartTour(90),
