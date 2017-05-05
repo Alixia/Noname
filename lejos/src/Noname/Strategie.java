@@ -285,7 +285,7 @@ public class Strategie implements APIStrategie {
 					moteurs.avancer();
 				}
 			}
-			if(tabRobot[indiceRobot][y] < (yCage - 10) || tabRobot[indiceRobot][y] > (yCage + 10)){
+			if(!(tabRobot[indiceRobot][y] > (yCage - 50) && tabRobot[indiceRobot][y] < (yCage + 50))){
 				mauvaisCamp = true;
 				moteurs.arreter();
 				moteurs.demiTour();
