@@ -13,7 +13,7 @@ public class Camera implements Runnable, APICamera {
 	private boolean[][] tabCollisions; // Tableau gerant les collisions
 	private Set<Integer> collisionsRobot1; // Collisions du robot 1
 	private Set<Integer> collisionsRobot2;
-	private Surveillance[] surveillance; // Surveille les collisions
+	private Surveillance2[] surveillance; // Surveille les collisions
 
 	// GESTION DE LA CAMERA
 	private DatagramSocket dSocket;
@@ -56,9 +56,9 @@ public class Camera implements Runnable, APICamera {
 		}
 		collisionsRobot1 = new HashSet<>();
 		collisionsRobot2 = new HashSet<>();
-		surveillance = new Surveillance[nbPalets + nbRobots];
+		surveillance = new Surveillance2[nbPalets + nbRobots];
 		for (int i = 0; i < surveillance.length; i++) {
-			surveillance[i] = new Surveillance();
+			surveillance[i] = new Surveillance2();
 		}
 		initialisation();
 	}
