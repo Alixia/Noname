@@ -3,17 +3,16 @@ package Noname;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import Noname.API.APICamera;
-
-public class Camera implements Runnable, APICamera {
+public class Camera implements Runnable {
 	// GESTION DES COLLISIONS
 	private boolean[][] tabCollisions; // Tableau gerant les collisions
 	private Set<Integer> collisionsRobot1; // Collisions du robot 1
 	private Set<Integer> collisionsRobot2;
-	private Surveillance2[] surveillance; // Surveille les collisions
+	private Set<Surveillance>[] surveillance; // Surveille les collisions
 
 	// GESTION DE LA CAMERA
 	private DatagramSocket dSocket;
@@ -24,7 +23,16 @@ public class Camera implements Runnable, APICamera {
 	private int[][] tabElements; // Contient tous les robots et palets
 	private int[] indiceRobots; // Contient l'indice des robots
 	private int[] indicePalets; // Contient l'indice des palets
+	private int nbPalets;
+	private int nbRobots;
 	private int nbTot;
+	
+	//gestion du set robot
+	private boolean setrobot = false;
+	private int setRobotX = -1;
+	private int setRobotY = -1;
+	public int numRobot = 0;
+	
 
 	// GESTION DU TABLEAU D'ELEMENTS
 	final private int nbDim = 3;
@@ -35,13 +43,16 @@ public class Camera implements Runnable, APICamera {
 
 	// VAR. GLOBALES
 	final private int nbMesures = 15;
-	final private int distanceColision = 30;
+	
+	final private int MOUVEMENTMAXPALET = 4;
 
-	final private int nbPalets = 9;
-	final private int nbRobots = 2;
+	final private int nbPal = 9;
+	final private int nbRob = 2;
 
 	// Constructeur
 	public Camera() {
+		this.nbPalets = nbPal;
+		this.nbRobots = nbRob;
 		this.nbTot = nbPalets + nbRobots;
 		this.tabElements = new int[nbTot][nbDim];
 		this.indiceRobots = new int[nbRobots];
@@ -56,9 +67,9 @@ public class Camera implements Runnable, APICamera {
 		}
 		collisionsRobot1 = new HashSet<>();
 		collisionsRobot2 = new HashSet<>();
-		surveillance = new Surveillance2[nbPalets + nbRobots];
+		surveillance = new HashSet[nbPalets + nbRobots];
 		for (int i = 0; i < surveillance.length; i++) {
-			surveillance[i] = new Surveillance2();
+			surveillance[i] = new HashSet<Surveillance>();
 		}
 		initialisation();
 	}
@@ -124,17 +135,17 @@ public class Camera implements Runnable, APICamera {
 	public int[][] getElements() {
 		return tabElements;
 	}
-	
-	public int[][] getPalets(){
+
+	public int[][] getPalets() {
 		int[][] tabPalets = new int[nbPalets][nbDim];
-		for(int i=0;i<nbPalets;i++){
+		for (int i = 0; i < nbPalets; i++) {
 			tabPalets[i][INDICE] = tabElements[i][INDICE];
 			tabPalets[i][X] = tabElements[i][X];
 			tabPalets[i][Y] = tabElements[i][Y];
 		}
 		return tabPalets;
 	}
-	
+
 	public int[][] getRobots(){
 		int[][] tabRobots = new int[nbRobots][nbDim];
 		for(int i=nbPalets;i<nbRobots + nbPalets;i++){
@@ -143,6 +154,13 @@ public class Camera implements Runnable, APICamera {
 			tabRobots[i-nbPalets][Y] = tabElements[i][Y];
 		}
 		return tabRobots;
+	}
+	
+	public void setRobot(int x, int y, int nr){
+		setrobot = false;
+		setRobotX = x;
+		setRobotY = y;
+		numRobot = nr;
 	}
 
 	public String afficheCollisions() {
@@ -165,33 +183,35 @@ public class Camera implements Runnable, APICamera {
 	public String afficheElements() {
 		String buff = "";
 		for (int i = 0; i < indicePalets.length; i++) {
-			buff += tabElements[indicePalets[i]][INDICE] + ":" + tabElements[indicePalets[i]][X] + " / " + tabElements[indicePalets[i]][Y] + "\n";
+			buff += tabElements[indicePalets[i]][INDICE] + ":" + tabElements[indicePalets[i]][X] + " / "
+					+ tabElements[indicePalets[i]][Y] + "\n";
 		}
 		buff += "\n";
 		for (int i = 0; i < indiceRobots.length; i++) {
-			buff += tabElements[indiceRobots[i]][INDICE] + ":" + tabElements[indiceRobots[i]][X] + " / " + tabElements[indiceRobots[i]][Y] + "\n";
+			buff += tabElements[indiceRobots[i]][INDICE] + ":" + tabElements[indiceRobots[i]][X] + " / "
+					+ tabElements[indiceRobots[i]][Y] + "\n";
 		}
 		return buff;
 	}
-	
 
 	public String afficheSurveillance() {
 		String buff = "";
-		for (int i = 0; i < surveillance.length; i++) {
-			buff += "i:" + i;
-			buff += " index:" + surveillance[i].index;
-			buff += " surv? " + surveillance[i].estSurveille;
-			buff += " dist: " + surveillance[i].distance;
-			buff += " mesures: " + surveillance[i].mesure;
-			buff += " collision avec " + surveillance[i].indexCollision;
-			buff += " pos: " + surveillance[i].posX + " / " + surveillance[i].posY;
-			buff += "\n";
-		}
+		// for (int i = 0; i < surveillance.length; i++) {
+		// buff += "i:" + i;
+		// buff += " index:" + surveillance[i].index;
+		// buff += " surv? " + surveillance[i].estSurveille;
+		// buff += " dist: " + surveillance[i].distance;
+		// buff += " mesures: " + surveillance[i].mesure;
+		// buff += " collision avec " + surveillance[i].indexCollision;
+		// buff += " pos: " + surveillance[i].posX + " / " +
+		// surveillance[i].posY;
+		// buff += "\n";
+		// }
 		return buff;
 	}
 
 	public static void main(String[] args) {
-		Cam2 c = new Cam2();
+		Cam3 c = new Cam3();
 		Thread t = new Thread(c);
 		t.run();
 	}
@@ -216,8 +236,15 @@ public class Camera implements Runnable, APICamera {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, dPacket.getLength());
+				System.out.println("------------debut " + iter + "--------------");
+				// System.out.println(msg);
 
 				MAJCoords(msg);
+
+				System.out.println(afficheElements());
+				// System.out.println(afficheSurveillance());
+				// System.out.println(afficheCollisions());
+				System.out.println("---------------fin------------------");
 				dPacket.setLength(buffer.length);
 				// Thread.sleep(500);
 				iter++;
@@ -227,12 +254,12 @@ public class Camera implements Runnable, APICamera {
 		}
 	}
 
-	
-	private boolean estRobot(int index){
+	private boolean estRobot(int index) {
 		return index >= nbPalets;
 	}
-	
-	public void MAJCoords(String msg) {
+
+	private void MAJCoords(String msg) {
+//		System.out.println(afficheElements());
 		boolean[] bElements = new boolean[nbTot];
 		tabCollisions = new boolean[nbTot][nbTot];
 		// Initialise toutes les collisions a faux
@@ -247,35 +274,51 @@ public class Camera implements Runnable, APICamera {
 		int[][] buffer = new int[buff.length][3];
 		for (int currentElt = 0; currentElt < buff.length; currentElt++) {
 			String[] coord = buff[currentElt].split(";");
-			buffer[currentElt][X]  = Integer.parseInt(coord[X]);
-			buffer[currentElt][Y]  = Integer.parseInt(coord[Y]);
-			buffer[currentElt][INDICE]  = 0;
+			buffer[currentElt][X] = Integer.parseInt(coord[X]);
+			buffer[currentElt][Y] = Integer.parseInt(coord[Y]);
+			buffer[currentElt][INDICE] = 0;
 		}
 
+		int nbProbRobots = 0;
+		int indProbRobot = -1;
 		for (int i = 0; i < nbTot; i++) {
-			
+
 			double minDistance = 500;
 			int indexMinDistance = 0;
-			
+
 			for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
 				int diffX = buffer[currentElt][X] - tabElements[i][X];
 				int diffY = buffer[currentElt][Y] - tabElements[i][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;
 					indexMinDistance = currentElt;
 				}
 			}
+			if(minDistance > MOUVEMENTMAXPALET){
+				nbProbRobots++;
+				indProbRobot = i;
+			}
 			tabElements[i][X] = buffer[indexMinDistance][X];
 			tabElements[i][Y] = buffer[indexMinDistance][Y];
 			buffer[indexMinDistance][INDICE]++;
 
 		}
-		
+		System.out.println(this.afficheElements());
+
+		if(nbProbRobots == 1 && !estRobot(indProbRobot)){
+			int echangeX = tabElements[indiceRobots[numRobot]][X];
+			int echangeY = tabElements[indiceRobots[numRobot]][Y];
+			tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot][X];
+			tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot][Y];
+			tabElements[indProbRobot][X] = echangeX;
+			tabElements[indProbRobot][Y] = echangeY;
+		}
 		
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
-			if(buffer[currentElt][INDICE] == 0){
+			if (buffer[currentElt][INDICE] == 0) {
 				ArrayList<Integer> collison = new ArrayList<>();
 				double minDistance = 500;
 				for (int i = 0; i < nbTot; i++) {
@@ -286,78 +329,164 @@ public class Camera implements Runnable, APICamera {
 						minDistance = currentDistance;
 						collison.clear();
 					}
-					if (minDistance == currentDistance){
+					if (minDistance == currentDistance) {
 						collison.add(i);
 					}
 				}
-				tabElements[collison.get(0)][X] = buffer[currentElt][X];
-				tabElements[collison.get(0)][Y] = buffer[currentElt][Y];
+
+				if(buffer[currentElt][Y]<25 || buffer[currentElt][Y]>275){ //si nous somme dans une cage
+					collison.sort(new Comparator<Integer>() { //on met le robot au debut pour qu'il soit tous seul sur la surveillance
+						@Override
+						public int compare(Integer a, Integer b) {
+							// TODO Auto-generated method stub
+							if (estRobot(a) && !estRobot(b))
+								return -1;
+							else if (!estRobot(a) && estRobot(b))
+								return 1;
+							else
+								return 0;
+						}
+					});
+				}
+				else{ //si nous ne somme pas dans une cage
+					collison.sort(new Comparator<Integer>() { //on met les palets au debut pour que le robot ne soit pas seul
+						@Override
+						public int compare(Integer a, Integer b) {
+							// TODO Auto-generated method stub
+							if (estRobot(a) && !estRobot(b))
+								return 1;
+							else if (!estRobot(a) && estRobot(b))
+								return -1;
+							else
+								return 0;
+						}
+					});
+				}
 				
-				surveillance[collison.get(0)].index = collison.get(0);				
-				surveillance[collison.get(0)].indexCollision = collison.get(1);
-				surveillance[collison.get(0)].estSurveille = true;				
-				surveillance[collison.get(0)].distance = 0;
-				surveillance[collison.get(0)].mesure = nbMesures;
-				surveillance[collison.get(0)].posX = buffer[currentElt][X];
-				surveillance[collison.get(0)].posY = buffer[currentElt][Y];
+				//puis on crée les surveillances de tel sorte que le premier elements se retrouve tout seul et les autre restent en colisions
 				
-				
-				surveillance[collison.get(1)].index = collison.get(1);				
-				surveillance[collison.get(1)].indexCollision = collison.get(0);
-				surveillance[collison.get(1)].estSurveille = true;				
-				surveillance[collison.get(1)].distance = 0;
-				surveillance[collison.get(1)].mesure = nbMesures;
-				surveillance[collison.get(1)].posX = tabElements[collison.get(1)][X];
-				surveillance[collison.get(1)].posY = tabElements[collison.get(1)][Y];	
-				
-				
+				/*for (int i = 0; i < collison.size() - 1; i++) {
+					for (int j = i + 1; j < collison.size(); j++) {*/
+				for(int j = 1; j < collison.size(); j++){
+						tabElements[collison.get(0)][X] = buffer[currentElt][X];
+						tabElements[collison.get(0)][Y] = buffer[currentElt][Y];
+						Surveillance s = new Surveillance();
+						s.index1 = collison.get(0);
+						s.index2 = collison.get(j);
+						s.mesure = nbMesures;
+						s.pos1X = buffer[currentElt][X];
+						s.pos1Y = buffer[currentElt][Y];
+
+						s.pos2X = tabElements[collison.get(j)][X];
+						s.pos2Y = tabElements[collison.get(j)][Y];
+
+						surveillance[collison.get(0)].add(s);
+						surveillance[collison.get(j)].add(s);
+				}
+
+				/*	}
+				}*/
 				
 			}
 		}
-		
-		
-		for(int indexMinDistance = 0 ; indexMinDistance < surveillance.length; indexMinDistance++){
-			if (surveillance[indexMinDistance].estSurveille) {
+
+		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
+			System.out.println("1 : debut surveillance");
+			boolean aEteEchange = false;//permet de savoir si il a deja ete echangé, pour eviter qu'il se retrouve en surveillance avec un autre element de même coordonnées
+			int echangeX = -100;
+			int echangeY = -100;
+			
+			for (Surveillance s : surveillance[monIndex]) {
+				System.out.println(2 + " : surveille = " + s.toString());
 				// Si le compteur n'est pas fini
-				if (surveillance[indexMinDistance].mesure > 0) {
-					surveillance[indexMinDistance].mesure--;
+				if (s.mesure > 0) {
+					System.out.println(3 + " : surveille = " + s.toString());
+					s.mesure--;
 				} else { // Gestion des objets en collision
-					
-					int monIndex = surveillance[indexMinDistance].index;
-					int posX = surveillance[monIndex].posX;
-					int posY = surveillance[monIndex].posY;
-					
-					int diffX = posX - tabElements[monIndex][X];
-					int diffY = posY - tabElements[monIndex][Y];
-					surveillance[monIndex].distance += Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
 
-					
-					int indexCollision = surveillance[indexMinDistance].indexCollision;
-					posX = surveillance[indexCollision].posX;
-					posY = surveillance[indexCollision].posY;
-					diffX = posX - tabElements[indexCollision][X];
-					diffY = posY - tabElements[indexCollision][Y];
-					surveillance[indexCollision].distance += Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
-					
-					if(surveillance[monIndex].distance == surveillance[indexCollision].distance){
-						surveillance[monIndex].mesure++;
-					}
-					else if (((surveillance[monIndex].distance < surveillance[indexCollision].distance) == estRobot(monIndex))) {
-					
-							int tempX = tabElements[monIndex][X];
-							int tempY = tabElements[monIndex][Y];
-							tabElements[monIndex][X] = tabElements[indexCollision][X];
-							tabElements[monIndex][Y] = tabElements[indexCollision][Y];
-							tabElements[indexCollision][X] = tempX;
-							tabElements[indexCollision][Y] = tempY;
+					int pos1X = s.pos1X;
+					int pos1Y = s.pos1Y;
 
-							surveillance[monIndex].estSurveille = false;
-							surveillance[indexCollision].estSurveille = false;
+					int diffX = pos1X - tabElements[s.index1][X];
+					int diffY = pos1Y - tabElements[s.index1][Y];
+					double distance1 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
+
+					int pos2X = s.pos2X;
+					int pos2Y = s.pos2Y;
+					diffX = pos2X - tabElements[s.index2][X];
+					diffY = pos2Y - tabElements[s.index2][Y];
+					double distance2 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
+
+					System.out.println(4 + " : surveille = " + s.toString());
+
+					if(aEteEchange){
+						tabElements[s.index2][X] = echangeX;
+						tabElements[s.index2][Y] = echangeY;
+					} else if (distance1 == distance2) {
+						System.out.println(9 + " : surveille = " + s.toString());
+						s.mesure++;
+					} else if (((distance1 < distance2) == estRobot(monIndex))) {
+						System.out.println(5 + " : surveille = " + s.toString());
+						System.out.println("(p)ROBOT < PALET " + "ic=" + s.index2 + "im=" + monIndex);
+
+						echangeX = tabElements[monIndex][X];
+						echangeY = tabElements[monIndex][Y];
+						tabElements[monIndex][X] = tabElements[s.index2][X];
+						tabElements[monIndex][Y] = tabElements[s.index2][Y];
+						tabElements[s.index2][X] = echangeX;
+						tabElements[s.index2][Y] = echangeY;
+
+						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
+						surveillance[autreIndex].remove(s);
+						surveillance[monIndex].remove(s);
+						aEteEchange = true;
+						
+					} else {
+						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
+						surveillance[autreIndex].remove(s);
+						surveillance[monIndex].remove(s);
 					}
-					else{
-						surveillance[monIndex].estSurveille = false;
-						surveillance[indexCollision].estSurveille = false;
-					}
+System.out.println(("10 : apres surveillance"));
+				}
+			}
+		}
+		if (setrobot){
+			
+
+			double minDistance = 500;
+			int indexMinDistance = 0;
+			
+			for (int currentElt = 0; currentElt < tabElements.length; currentElt++) {
+				int diffX = setRobotX - tabElements[currentElt][X];
+				int diffY = setRobotX - tabElements[currentElt][Y];
+				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+				// System.out.println("currentP = " + current );
+				// Trouver la plus courte distance
+				if (minDistance > currentDistance) {
+					minDistance = currentDistance;
+					indexMinDistance = currentElt;
+				}
+			}
+			if(indiceRobots[numRobot] == indexMinDistance){
+				setrobot = false;
+				setRobotX = -1;
+				setRobotY = -1;
+			}
+			else{
+				if(surveillance[indiceRobots[numRobot]].isEmpty() && surveillance[indexMinDistance].isEmpty()){
+					
+
+					int echangeX = tabElements[indiceRobots[numRobot]][X];
+					int echangeY = tabElements[indiceRobots[numRobot]][Y];
+					tabElements[indiceRobots[numRobot]][X] = tabElements[indexMinDistance][X];
+					tabElements[indiceRobots[numRobot]][Y] = tabElements[indexMinDistance][Y];
+					tabElements[indexMinDistance][X] = echangeX;
+					tabElements[indexMinDistance][Y] = echangeY;
+				
+				
+					setrobot = false;
+					setRobotX = -1;
+					setRobotY = -1;
 				}
 			}
 		}
