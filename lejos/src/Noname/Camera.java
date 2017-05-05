@@ -211,7 +211,7 @@ public class Camera implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Cam3 c = new Cam3();
+		Camera c = new Camera();
 		Thread t = new Thread(c);
 		t.run();
 	}
@@ -236,15 +236,9 @@ public class Camera implements Runnable {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, dPacket.getLength());
-				System.out.println("------------debut " + iter + "--------------");
-				// System.out.println(msg);
 
 				MAJCoords(msg);
 
-				System.out.println(afficheElements());
-				// System.out.println(afficheSurveillance());
-				// System.out.println(afficheCollisions());
-				System.out.println("---------------fin------------------");
 				dPacket.setLength(buffer.length);
 				// Thread.sleep(500);
 				iter++;
@@ -306,7 +300,6 @@ public class Camera implements Runnable {
 			buffer[indexMinDistance][INDICE]++;
 
 		}
-		System.out.println(this.afficheElements());
 
 		if(nbProbRobots == 1 && !estRobot(indProbRobot)){
 			int echangeX = tabElements[indiceRobots[numRobot]][X];
@@ -335,32 +328,24 @@ public class Camera implements Runnable {
 				}
 
 				if(buffer[currentElt][Y]<25 || buffer[currentElt][Y]>275){ //si nous somme dans une cage
-					collison.sort(new Comparator<Integer>() { //on met le robot au debut pour qu'il soit tous seul sur la surveillance
-						@Override
-						public int compare(Integer a, Integer b) {
-							// TODO Auto-generated method stub
-							if (estRobot(a) && !estRobot(b))
-								return -1;
-							else if (!estRobot(a) && estRobot(b))
-								return 1;
-							else
-								return 0;
+					for (int i=0; i<collison.size(); i++){//on met le robot au debut pour qu'il soit tous seul sur la surveillance
+						if(estRobot(collison.get(i))){
+							int index = collison.get(i);
+							collison.set(i, collison.get(0));
+							collison.set(0, index);
+							break;
 						}
-					});
+					}
 				}
 				else{ //si nous ne somme pas dans une cage
-					collison.sort(new Comparator<Integer>() { //on met les palets au debut pour que le robot ne soit pas seul
-						@Override
-						public int compare(Integer a, Integer b) {
-							// TODO Auto-generated method stub
-							if (estRobot(a) && !estRobot(b))
-								return 1;
-							else if (!estRobot(a) && estRobot(b))
-								return -1;
-							else
-								return 0;
+					for (int i=0; i<collison.size(); i++){//on met les palets au debut pour que le robot ne soit pas seul
+						if(!estRobot(collison.get(i))){
+							int index = collison.get(i);
+							collison.set(i, collison.get(0));
+							collison.set(0, index);
+							break;
 						}
-					});
+					}
 				}
 				
 				//puis on crée les surveillances de tel sorte que le premier elements se retrouve tout seul et les autre restent en colisions
@@ -391,16 +376,13 @@ public class Camera implements Runnable {
 		}
 
 		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
-			System.out.println("1 : debut surveillance");
 			boolean aEteEchange = false;//permet de savoir si il a deja ete echangé, pour eviter qu'il se retrouve en surveillance avec un autre element de même coordonnées
 			int echangeX = -100;
 			int echangeY = -100;
 			
 			for (Surveillance s : surveillance[monIndex]) {
-				System.out.println(2 + " : surveille = " + s.toString());
 				// Si le compteur n'est pas fini
 				if (s.mesure > 0) {
-					System.out.println(3 + " : surveille = " + s.toString());
 					s.mesure--;
 				} else { // Gestion des objets en collision
 
@@ -417,17 +399,13 @@ public class Camera implements Runnable {
 					diffY = pos2Y - tabElements[s.index2][Y];
 					double distance2 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
 
-					System.out.println(4 + " : surveille = " + s.toString());
 
 					if(aEteEchange){
 						tabElements[s.index2][X] = echangeX;
 						tabElements[s.index2][Y] = echangeY;
 					} else if (distance1 == distance2) {
-						System.out.println(9 + " : surveille = " + s.toString());
 						s.mesure++;
 					} else if (((distance1 < distance2) == estRobot(monIndex))) {
-						System.out.println(5 + " : surveille = " + s.toString());
-						System.out.println("(p)ROBOT < PALET " + "ic=" + s.index2 + "im=" + monIndex);
 
 						echangeX = tabElements[monIndex][X];
 						echangeY = tabElements[monIndex][Y];
@@ -446,7 +424,6 @@ public class Camera implements Runnable {
 						surveillance[autreIndex].remove(s);
 						surveillance[monIndex].remove(s);
 					}
-System.out.println(("10 : apres surveillance"));
 				}
 			}
 		}

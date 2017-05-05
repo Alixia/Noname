@@ -206,8 +206,10 @@ public class Strategie implements APIStrategie {
 			miseAJour(i);
 			i = (i + 1) % 11;
 			if(i == 0){ //l'angle a été mis a jour
-				seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
-				moteurs.avancer();
+				if((Math.abs(tabRobot[indiceRobot][x] - pallet.x) < 30 ) &&( Math.abs(tabRobot[indiceRobot][y] - pallet.y) < 30)){
+					seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
+					moteurs.avancer();
+				}
 			}
 		}
 
