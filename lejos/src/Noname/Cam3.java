@@ -26,6 +26,13 @@ public class Cam3 implements Runnable {
 	private int nbPalets;
 	private int nbRobots;
 	private int nbTot;
+	
+	//gestion du set robot
+	private boolean setrobot = false;
+	private int setRobotX = -1;
+	private int setRobotY = -1;
+	public int numRobot = 0;
+	
 
 	// GESTION DU TABLEAU D'ELEMENTS
 	final private int nbDim = 3;
@@ -36,6 +43,8 @@ public class Cam3 implements Runnable {
 
 	// VAR. GLOBALES
 	final private int nbMesures = 15;
+	
+	final private int MOUVEMENTMAXPALET = 4;
 
 	final private int nbPal = 9;
 	final private int nbRob = 2;
@@ -146,6 +155,13 @@ public class Cam3 implements Runnable {
 		}
 		return tabRobots;
 	}
+	
+	public void setRobot(int x, int y, int nr){
+		setrobot = false;
+		setRobotX = x;
+		setRobotY = y;
+		numRobot = nr;
+	}
 
 	public String afficheCollisions() {
 		String buffer = "";
@@ -243,7 +259,7 @@ public class Cam3 implements Runnable {
 	}
 
 	private void MAJCoords(String msg) {
-		System.out.println(afficheElements());
+//		System.out.println(afficheElements());
 		boolean[] bElements = new boolean[nbTot];
 		tabCollisions = new boolean[nbTot][nbTot];
 		// Initialise toutes les collisions a faux
@@ -263,6 +279,8 @@ public class Cam3 implements Runnable {
 			buffer[currentElt][INDICE] = 0;
 		}
 
+		int nbProbRobots = 0;
+		int indProbRobot = -1;
 		for (int i = 0; i < nbTot; i++) {
 
 			double minDistance = 500;
@@ -279,6 +297,10 @@ public class Cam3 implements Runnable {
 					indexMinDistance = currentElt;
 				}
 			}
+			if(minDistance > MOUVEMENTMAXPALET){
+				nbProbRobots++;
+				indProbRobot = i;
+			}
 			tabElements[i][X] = buffer[indexMinDistance][X];
 			tabElements[i][Y] = buffer[indexMinDistance][Y];
 			buffer[indexMinDistance][INDICE]++;
@@ -286,6 +308,15 @@ public class Cam3 implements Runnable {
 		}
 		System.out.println(this.afficheElements());
 
+		if(nbProbRobots == 1 && !estRobot(indProbRobot)){
+			int echangeX = tabElements[indiceRobots[numRobot]][X];
+			int echangeY = tabElements[indiceRobots[numRobot]][Y];
+			tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot][X];
+			tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot][Y];
+			tabElements[indProbRobot][X] = echangeX;
+			tabElements[indProbRobot][Y] = echangeY;
+		}
+		
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
 			if (buffer[currentElt][INDICE] == 0) {
 				ArrayList<Integer> collison = new ArrayList<>();
@@ -360,6 +391,7 @@ public class Cam3 implements Runnable {
 		}
 
 		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
+			System.out.println("1 : debut surveillance");
 			boolean aEteEchange = false;//permet de savoir si il a deja ete echangé, pour eviter qu'il se retrouve en surveillance avec un autre element de même coordonnées
 			int echangeX = -100;
 			int echangeY = -100;
@@ -404,13 +436,57 @@ public class Cam3 implements Runnable {
 						tabElements[s.index2][X] = echangeX;
 						tabElements[s.index2][Y] = echangeY;
 
+						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
+						surveillance[autreIndex].remove(s);
 						surveillance[monIndex].remove(s);
 						aEteEchange = true;
 						
 					} else {
+						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
+						surveillance[autreIndex].remove(s);
 						surveillance[monIndex].remove(s);
 					}
+System.out.println(("10 : apres surveillance"));
+				}
+			}
+		}
+		if (setrobot){
+			
 
+			double minDistance = 500;
+			int indexMinDistance = 0;
+			
+			for (int currentElt = 0; currentElt < tabElements.length; currentElt++) {
+				int diffX = setRobotX - tabElements[currentElt][X];
+				int diffY = setRobotX - tabElements[currentElt][Y];
+				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+				// System.out.println("currentP = " + current );
+				// Trouver la plus courte distance
+				if (minDistance > currentDistance) {
+					minDistance = currentDistance;
+					indexMinDistance = currentElt;
+				}
+			}
+			if(indiceRobots[numRobot] == indexMinDistance){
+				setrobot = false;
+				setRobotX = -1;
+				setRobotY = -1;
+			}
+			else{
+				if(surveillance[indiceRobots[numRobot]].isEmpty() && surveillance[indexMinDistance].isEmpty()){
+					
+
+					int echangeX = tabElements[indiceRobots[numRobot]][X];
+					int echangeY = tabElements[indiceRobots[numRobot]][Y];
+					tabElements[indiceRobots[numRobot]][X] = tabElements[indexMinDistance][X];
+					tabElements[indiceRobots[numRobot]][Y] = tabElements[indexMinDistance][Y];
+					tabElements[indexMinDistance][X] = echangeX;
+					tabElements[indexMinDistance][Y] = echangeY;
+				
+				
+					setrobot = false;
+					setRobotX = -1;
+					setRobotY = -1;
 				}
 			}
 		}
