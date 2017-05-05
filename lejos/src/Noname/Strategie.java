@@ -19,6 +19,8 @@ public class Strategie implements APIStrategie {
 	private MachineEtat etat;
 	private int[][] tabPallet;
 	private int[][] tabRobot;
+	private int[][] newTabPallet;
+	private int[][] newTabRobot;
 	private int indiceRobot;
 	private int indiceAdverse;
 	private int x = 1;
@@ -30,37 +32,30 @@ public class Strategie implements APIStrategie {
 	private int yMax;
 	public Camera cam;
 	private Thread ThreadCam;
+	private boolean aGauche;
 
-	public Strategie(Capteurs ca, Moteurs m, Pince p) {
+	public Strategie(Capteurs ca, Moteurs m, Pince p, boolean aGauche) {
 		this.capteur = ca;
 		this.moteurs = m;
 		this.pince = p;
 		etat = MachineEtat.NOPALLET;
 		cam = new Camera();
 		ThreadCam = new Thread(cam);
+		this.aGauche = aGauche;
 		intialisation();
 	}
 
 	public void calibration() {
-		System.out.println("Calibration du terrain");
-		// Tant que ce n'est ni LEFT ni RIGHT, redemander
-		boolean reAsk = true;
-		do {
-			System.out.println("Le robot est a gauche ou a droite de la camera ?");
-			Button.waitForAnyPress();
 			// Si le robot commence la partie a gauche
-			if (Button.LEFT.isDown()) {
-				moteurs.setAngle(0);
-				indiceRobot = 0;
-				indiceAdverse = 1;
-				reAsk = false;
-			} else if (Button.RIGHT.isDown()) { // Robot commence a droite
-				moteurs.setAngle(180);
-				indiceRobot = 1;
-				indiceAdverse = 0;
-				reAsk = false;
-			}
-		} while (reAsk);
+		if (aGauche) {
+			moteurs.setAngle(0);
+			indiceRobot = 0;
+			indiceAdverse = 1;
+		} else{ // Robot commence a droite
+			moteurs.setAngle(180);
+			indiceRobot = 1;
+			indiceAdverse = 0;
+		}
 		// Le but est du cote du robot adverse au debut
 		yCage = tabRobot[indiceAdverse][y];
 		yCageAdverse = tabRobot[indiceRobot][y];
@@ -76,7 +71,10 @@ public class Strategie implements APIStrategie {
 			e.printStackTrace();
 		}
 		lancerCam();
-
+		
+		newTabPallet = cam.getPalets();
+		newTabRobot = cam.getRobots();
+		
 		tabPallet = cam.getPalets();
 		tabRobot = cam.getRobots();
 		calibration();
@@ -84,7 +82,7 @@ public class Strategie implements APIStrategie {
 
 	// Permet de ramener le premier palet dans les cages
 	public void ramenerPremierPalet() {
-		miseAJour();
+		miseAJour(1);
 		// Position du robot
 		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		// Decalage du robot pour esquiver les palets
@@ -95,7 +93,7 @@ public class Strategie implements APIStrategie {
 		moteurs.avancer();
 		Delay.msDelay(1200);
 		moteurs.arreter();
-		miseAJour();
+		miseAJour(1);
 		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		dest.move(tabRobot[indiceRobot][x], yCage);
 		seDirigerVers(pos, dest);
@@ -109,7 +107,7 @@ public class Strategie implements APIStrategie {
 				if (capteur.getCurrentColor().equals(Couleur.blanc)) {
 					enCours = false;
 				}
-				miseAJour();
+				miseAJour(1);
 			}
 			moteurs.arreter();
 		}
@@ -190,7 +188,7 @@ public class Strategie implements APIStrategie {
 		if (estTrouve) {
 			plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
 		}
-		System.out.println("Je vais au point : ()" + tabPallet[indicePalletPlusProche][x] + ";"+ tabPallet[indicePalletPlusProche][y]+")");
+		System.out.println("Je vais au point : (" + tabPallet[indicePalletPlusProche][x] + ";"+ tabPallet[indicePalletPlusProche][y]+")");
 		return plusProche;
 	}
 
@@ -198,18 +196,19 @@ public class Strategie implements APIStrategie {
 		// avance jusqu'au pallet et le prend en pince
 		seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
 		moteurs.avancer();
-		miseAJour();
+		miseAJour(0);
 
 		// prendre en compte les erreurs potentielles du aux angles
 		// prendre en compte les obstacle
-		while (!capteur
-				.boutonEstPresse() /*
-									 * && !pointsEgaux(new
-									 * Point(tabRobot[indiceAdverse][x],
-									 * tabRobot[indiceAdverse][y]), pallet)
-									 */) {
+		int i = 1;
+		while (!capteur.boutonEstPresse()) {
 			Delay.msDelay(200);
-			miseAJour();
+			miseAJour(i);
+			i = (i + 1) % 11;
+			if(i == 0){ //l'angle a été mis a jour
+				seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
+				moteurs.avancer();
+			}
 		}
 
 		if (capteur.boutonEstPresse()) {
@@ -222,48 +221,83 @@ public class Strategie implements APIStrategie {
 	}
 
 	// met a jour les tableau palet et robot et l'angle
-	public void miseAJour() {
-		int[][] newTabPallet = cam.getPalets();
-		int[][] newTabRobot = cam.getRobots();
+	public void miseAJour(int nbIter) {
+		int[][] newTabPallet2 = cam.getPalets();
+		int[][] newTabRobot2 = cam.getRobots();
 		// afficherTableaux();
 
-		if ((Math.abs(newTabPallet[indiceRobot][x] - tabPallet[indiceRobot][x]) < 10)
-				|| (Math.abs(newTabPallet[indiceRobot][y] - tabPallet[indiceRobot][y]) < 10)) {
+		if (nbIter == 0) {
+			newTabPallet = cam.getPalets();
+			newTabRobot = cam.getRobots();
+		}
+		if(nbIter == 10){
 			double teta = 0;
-			if (newTabPallet[indiceRobot][y] == tabPallet[indiceRobot][y]) {
-				if (newTabPallet[indiceRobot][x] > tabPallet[indiceRobot][x]) {
+			if (newTabRobot[indiceRobot][y] == newTabRobot2[indiceRobot][y]) {
+				if (newTabRobot[indiceRobot][x] > newTabRobot2[indiceRobot][x]) {
 					teta = 90;
 				} else
-					teta = 120;
+					teta = 270;
 			} else {
 				double tangenteTeta = 0;
-				if ((newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]) != 0)
-					tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - tabRobot[indiceRobot][x])
-							/ (newTabRobot[indiceRobot][y] - tabRobot[indiceRobot][y]));
+				tangenteTeta = Math.abs((newTabRobot[indiceRobot][x] - newTabRobot2[indiceRobot][x])
+							/ (newTabRobot[indiceRobot][y] - newTabRobot2[indiceRobot][y]));
 				teta = Math.atan(tangenteTeta);
+				if(newTabRobot[indiceRobot][y] > newTabRobot2[indiceRobot][y]){
+					if(newTabRobot[indiceRobot][x] > newTabRobot2[indiceRobot][x]){
+						teta = 180 - teta;
+					}else{
+						teta = 180 + teta;
+					}
+				}else{
+					if(newTabRobot[indiceRobot][x] > newTabRobot2[indiceRobot][x]){
+						teta = teta;
+					}else{
+						teta = 360 - teta;
+					}
+				}
+				
 			}
-			// moteurs.setAngle(teta);
-			System.arraycopy(newTabPallet, 0, tabPallet, 0, tabPallet.length);
-			System.arraycopy(newTabRobot, 0, tabRobot, 0, tabRobot.length);
+			if(Math.abs(moteurs.getAngle()) > Math.abs(teta - 5) ){
+				moteurs.setAngle(teta);
+			}
+			
 		}
+
+		System.arraycopy(newTabPallet2, 0, tabPallet, 0, tabPallet.length);
+		System.arraycopy(newTabRobot2, 0, tabRobot, 0, tabRobot.length);
 	}
 
 	public void rentrerALaMaison() {
-		seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
-		moteurs.avancer();
-
 		// prendre en compte les erreurs potentielles du aux angles
 		// prendre en compte les obstacle
-		while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
-			Delay.msDelay(100);
-		}
+		miseAJour(0);
+		int i = 1;
+		boolean mauvaisCamp = false;
+		do{
+			seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
+			moteurs.avancer();
+			while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
+				Delay.msDelay(100);
+				miseAJour(i);
+				i = (i + 1) % 11;
+				if(i == 0){ //l'angle a été mis a jour
+					seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
+					moteurs.avancer();
+				}
+			}
+			if(tabRobot[indiceRobot][y] < (yCage - 10) || tabRobot[indiceRobot][y] > (yCage + 10)){
+				mauvaisCamp = true;
+				moteurs.arreter();
+				moteurs.demiTour();
+			}
+		}while(mauvaisCamp);
 		moteurs.arreter();
 		pince.ouvrirPince();
 		moteurs.reculer();
 		Delay.msDelay(500);
 		moteurs.arreter();
 
-		miseAJour();
+		miseAJour(1);
 	}
 
 	public void lancerCam() {
@@ -298,6 +332,8 @@ public class Strategie implements APIStrategie {
 			switch (etat) {
 			case NOPALLET:
 				pallet = detecterPlusProchePallet();
+				System.out.println("Je suis au point : (" + tabRobot[indiceRobot][x] + ";"+ tabRobot[indiceRobot][y]+")");
+				System.out.println("Angle : " + moteurs.getAngle());
 				// il n'y a plus de pallet à aller chercher
 				if (pallet.x == -1) {
 					boucle = false;

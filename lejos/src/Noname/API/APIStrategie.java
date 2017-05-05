@@ -40,9 +40,14 @@ public interface APIStrategie {
 	public boolean allerChercherPallet(Point pallet);
 	
 	/**
-	 *  Met a jour les tableau palet et robot et l'angle
+	 * 
+	 *  
 	 */
-	public void miseAJour();
+	/**
+	 *  Met a jour les tableau palet et robot et l'angle
+	 * @param nbIter permet de savoir combien de fois on l'appel (utile pour la gestion de l'angle)
+	 */
+	public void miseAJour(int nbIter);
 	
 	/**
 	 * Ramene le palet dans les cages
