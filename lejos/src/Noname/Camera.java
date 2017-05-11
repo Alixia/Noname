@@ -29,13 +29,12 @@ public class Camera implements Runnable {
 	private int nbPalets;
 	private int nbRobots;
 	private int nbTot;
-	
-	//gestion du set robot
+
+	// gestion du set robot
 	private boolean setrobot = false;
 	private int setRobotX = -1;
 	private int setRobotY = -1;
 	public int numRobot = 0;
-	
 
 	// GESTION DU TABLEAU D'ELEMENTS
 	final private int nbDim = 3;
@@ -46,7 +45,7 @@ public class Camera implements Runnable {
 
 	// VAR. GLOBALES
 	final private int nbMesures = 5;
-	
+
 	final private int MOUVEMENTMAXPALET = 4;
 
 	final private int nbPal = 3;
@@ -149,7 +148,7 @@ public class Camera implements Runnable {
 		return tabPalets;
 	}
 
-	public int[][] getRobots(){
+	public int[][] getRobots() {
 		int[][] tabRobots = new int[nbRobots][nbDim];
 		for (int i = 0; i < indiceRobots.length; i++) {
 			tabRobots[i][INDICE] = tabElements[indiceRobots[i]][INDICE];
@@ -158,10 +157,9 @@ public class Camera implements Runnable {
 		}
 		return tabRobots;
 	}
-	
-	public void setRobot(int x, int y, int nr){
+
+	public void setRobot(int y, int nr) {
 		setrobot = false;
-		setRobotX = x;
 		setRobotY = y;
 		numRobot = nr;
 	}
@@ -285,8 +283,7 @@ public class Camera implements Runnable {
 		}
 
 		int nbProbRobots = 0;
-		int indProbRobot1 = -1;
-		int indProbRobot2 = -1;
+		int indProbRobot[] = new int[nbRobots];
 		for (int i = 0; i < nbTot; i++) {
 
 			double minDistance = 500;
@@ -302,37 +299,136 @@ public class Camera implements Runnable {
 					indexMinDistance = currentElt;
 				}
 			}
-			if(minDistance > MOUVEMENTMAXPALET){
+			if (minDistance > MOUVEMENTMAXPALET) {
+				indProbRobot[nbProbRobots] = i;
 				nbProbRobots++;
-				if(indProbRobot1 == -1)
-					indProbRobot1 = i;
-				else
-					indProbRobot1 = i;
 			}
 			tabElements[i][X] = buffer[indexMinDistance][X];
 			tabElements[i][Y] = buffer[indexMinDistance][Y];
 			buffer[indexMinDistance][INDICE]++;
 
 		}
-		if(nbProbRobots == 2){
-			if(!estRobot(indProbRobot1)){
-				int echangeX = tabElements[indiceRobots[numRobot]][X];
-				int echangeY = tabElements[indiceRobots[numRobot]][Y];
-				tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot1][X];
-				tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot1][Y];
-				tabElements[indProbRobot1][X] = echangeX;
-				tabElements[indProbRobot1][Y] = echangeY;
-			}
-			if(!estRobot(indProbRobot2)){
-				int echangeX = tabElements[indiceRobots[numRobot]][X];
-				int echangeY = tabElements[indiceRobots[numRobot]][Y];
-				tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot2][X];
-				tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot2][Y];
-				tabElements[indProbRobot2][X] = echangeX;
-				tabElements[indProbRobot2][Y] = echangeY;
+
+		if (nbProbRobots == nbRobots) {
+			int diffx = tabElements[indProbRobot[0]][X] - tabElements[indiceRobots[0]][X];
+			int diffy = tabElements[indProbRobot[0]][Y] - tabElements[indiceRobots[0]][Y];
+			double distProb0Robot0 = Math.sqrt(diffx * diffx + diffy * diffy);
+
+			diffx = tabElements[indProbRobot[0]][X] - tabElements[indiceRobots[1]][X];
+			diffy = tabElements[indProbRobot[0]][Y] - tabElements[indiceRobots[1]][Y];
+			double distProb0Robot1 = Math.sqrt(diffx * diffx + diffy * diffy);
+
+			diffx = tabElements[indProbRobot[1]][X] - tabElements[indiceRobots[0]][X];
+			diffy = tabElements[indProbRobot[1]][Y] - tabElements[indiceRobots[0]][Y];
+			double distProb1Robot0 = Math.sqrt(diffx * diffx + diffy * diffy);
+
+			diffx = tabElements[indProbRobot[1]][X] - tabElements[indiceRobots[1]][X];
+			diffy = tabElements[indProbRobot[1]][Y] - tabElements[indiceRobots[1]][Y];
+			double distProb1Robot1 = Math.sqrt(diffx * diffx + diffy * diffy);
+
+			if (distProb0Robot0 < distProb0Robot1) {
+				if(distProb1Robot1 <= distProb1Robot0) {
+					if(!estRobot(indProbRobot[0])){
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+					}
+					if(!estRobot(indProbRobot[1])){
+						int echangeX = tabElements[indProbRobot[1]][X];
+						int echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+					}
+				}else{
+					if(estRobot(indProbRobot[0])){
+						int echangeX = tabElements[indProbRobot[1]][X];
+						int echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+					}
+					if(estRobot(indProbRobot[1])){
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+					}
+					else{
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+						echangeX = tabElements[indProbRobot[1]][X];
+						echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+					}
+				}
+			} else {
+				if(distProb1Robot1 > distProb1Robot0) {
+					if(!estRobot(indProbRobot[0])){
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+					}
+					if(!estRobot(indProbRobot[1])){
+						int echangeX = tabElements[indProbRobot[1]][X];
+						int echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+					}
+				}else{
+					if(estRobot(indProbRobot[0])){
+						int echangeX = tabElements[indProbRobot[1]][X];
+						int echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+					}
+					if(estRobot(indProbRobot[1])){
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+					}
+					else{
+						int echangeX = tabElements[indProbRobot[0]][X];
+						int echangeY = tabElements[indProbRobot[0]][Y];
+						tabElements[indProbRobot[0]][X] = tabElements[indiceRobots[1]][X];
+						tabElements[indProbRobot[0]][Y] = tabElements[indiceRobots[1]][Y];
+						tabElements[indiceRobots[1]][X] = echangeX;
+						tabElements[indiceRobots[1]][Y] = echangeY;
+						echangeX = tabElements[indProbRobot[1]][X];
+						echangeY = tabElements[indProbRobot[1]][Y];
+						tabElements[indProbRobot[1]][X] = tabElements[indiceRobots[0]][X];
+						tabElements[indProbRobot[1]][Y] = tabElements[indiceRobots[0]][Y];
+						tabElements[indiceRobots[0]][X] = echangeX;
+						tabElements[indiceRobots[0]][Y] = echangeY;
+					}
+				}
 			}
 		}
-		
+
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
 			if (buffer[currentElt][INDICE] == 0) {
 				ArrayList<Integer> collison = new ArrayList<>();
@@ -350,9 +446,34 @@ public class Camera implements Runnable {
 					}
 				}
 
-				if(buffer[currentElt][Y]<25 || buffer[currentElt][Y]>275){ //si nous somme dans une cage
-					for (int i=0; i<collison.size(); i++){//on met le robot au debut pour qu'il soit tous seul sur la surveillance
-						if(estRobot(collison.get(i))){
+				if (buffer[currentElt][Y] < 25 || buffer[currentElt][Y] > 275) { // si
+																					// nous
+																					// somme
+																					// dans
+																					// une
+																					// cage
+					for (int i = 0; i < collison.size(); i++) {// on met le
+																// robot au
+																// debut pour
+																// qu'il soit
+																// tous seul sur
+																// la
+																// surveillance
+						if (estRobot(collison.get(i))) {
+							int index = collison.get(i);
+							collison.set(i, collison.get(0));
+							collison.set(0, index);
+							break;
+						}
+					}
+				} else { // si nous ne somme pas dans une cage
+					for (int i = 0; i < collison.size(); i++) {// on met les
+																// palets au
+																// debut pour
+																// que le robot
+																// ne soit pas
+																// seul
+						if (!estRobot(collison.get(i))) {
 							int index = collison.get(i);
 							collison.set(i, collison.get(0));
 							collison.set(0, index);
@@ -360,49 +481,47 @@ public class Camera implements Runnable {
 						}
 					}
 				}
-				else{ //si nous ne somme pas dans une cage
-					for (int i=0; i<collison.size(); i++){//on met les palets au debut pour que le robot ne soit pas seul
-						if(!estRobot(collison.get(i))){
-							int index = collison.get(i);
-							collison.set(i, collison.get(0));
-							collison.set(0, index);
-							break;
-						}
-					}
-				}
-				
-				//puis on crée les surveillances de tel sorte que le premier elements se retrouve tout seul et les autre restent en colisions
-				
-				/*for (int i = 0; i < collison.size() - 1; i++) {
-					for (int j = i + 1; j < collison.size(); j++) {*/
-				for(int j = 1; j < collison.size(); j++){
-						tabElements[collison.get(0)][X] = buffer[currentElt][X];
-						tabElements[collison.get(0)][Y] = buffer[currentElt][Y];
-						Surveillance s = new Surveillance();
-						s.index1 = collison.get(0);
-						s.index2 = collison.get(j);
-						s.mesure = nbMesures;
-						s.pos1X = buffer[currentElt][X];
-						s.pos1Y = buffer[currentElt][Y];
 
-						s.pos2X = tabElements[collison.get(j)][X];
-						s.pos2Y = tabElements[collison.get(j)][Y];
+				// puis on crée les surveillances de tel sorte que le premier
+				// elements se retrouve tout seul et les autre restent en
+				// colisions
 
-						surveillance[collison.get(0)].add(s);
-						surveillance[collison.get(j)].add(s);
+				/*
+				 * for (int i = 0; i < collison.size() - 1; i++) { for (int j =
+				 * i + 1; j < collison.size(); j++) {
+				 */
+				for (int j = 1; j < collison.size(); j++) {
+					tabElements[collison.get(0)][X] = buffer[currentElt][X];
+					tabElements[collison.get(0)][Y] = buffer[currentElt][Y];
+					Surveillance s = new Surveillance();
+					s.index1 = collison.get(0);
+					s.index2 = collison.get(j);
+					s.mesure = nbMesures;
+					s.pos1X = buffer[currentElt][X];
+					s.pos1Y = buffer[currentElt][Y];
+
+					s.pos2X = tabElements[collison.get(j)][X];
+					s.pos2Y = tabElements[collison.get(j)][Y];
+
+					surveillance[collison.get(0)].add(s);
+					surveillance[collison.get(j)].add(s);
 				}
 
-				/*	}
-				}*/
-				
+				/*
+				 * } }
+				 */
+
 			}
 		}
 
 		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
-			boolean aEteEchange = false;//permet de savoir si il a deja ete echangé, pour eviter qu'il se retrouve en surveillance avec un autre element de même coordonnées
+			boolean aEteEchange = false;// permet de savoir si il a deja ete
+										// echangé, pour eviter qu'il se
+										// retrouve en surveillance avec un
+										// autre element de même coordonnées
 			int echangeX = -100;
 			int echangeY = -100;
-			
+
 			for (Surveillance s : surveillance[monIndex]) {
 				// Si le compteur n'est pas fini
 				if (s.mesure > 0) {
@@ -422,8 +541,7 @@ public class Camera implements Runnable {
 					diffY = pos2Y - tabElements[s.index2][Y];
 					double distance2 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
 
-
-					if(aEteEchange){
+					if (aEteEchange) {
 						tabElements[s.index2][X] = echangeX;
 						tabElements[s.index2][Y] = echangeY;
 					} else if (distance1 == distance2) {
@@ -452,11 +570,9 @@ public class Camera implements Runnable {
 			}
 		}
 		if (setrobot && ((setRobotX != -1) || (setRobotY != -1))){
-			
-			
 			double minDistance = 500;
 			int indexMinDistance = 0;
-			
+
 			for (int currentElt = 0; currentElt < tabElements.length; currentElt++) {
 				
 				int diffX = setRobotX - tabElements[currentElt][X];
@@ -475,14 +591,12 @@ public class Camera implements Runnable {
 					indexMinDistance = currentElt;
 				}
 			}
-			if(indiceRobots[numRobot] == indexMinDistance){
+			if (indiceRobots[numRobot] == indexMinDistance) {
 				setrobot = false;
 				setRobotX = -1;
 				setRobotY = -1;
-			}
-			else{
-				if(surveillance[indiceRobots[numRobot]].isEmpty() && surveillance[indexMinDistance].isEmpty()){
-					
+			} else {
+				if (surveillance[indiceRobots[numRobot]].isEmpty() && surveillance[indexMinDistance].isEmpty()) {
 
 					int echangeX = tabElements[indiceRobots[numRobot]][X];
 					int echangeY = tabElements[indiceRobots[numRobot]][Y];
@@ -490,8 +604,7 @@ public class Camera implements Runnable {
 					tabElements[indiceRobots[numRobot]][Y] = tabElements[indexMinDistance][Y];
 					tabElements[indexMinDistance][X] = echangeX;
 					tabElements[indexMinDistance][Y] = echangeY;
-				
-				
+
 					setrobot = false;
 					setRobotX = -1;
 					setRobotY = -1;

@@ -195,7 +195,11 @@ public class Strategie implements APIStrategie {
 		// prendre en compte les obstacle
 		int i = 0;
 		while (!capteur.boutonEstPresse() && !capteur.getCurrentColor().equals(Couleur.blanc)) {
-			Delay.msDelay(50);
+			Delay.msDelay(100);
+
+			Point coord = capteur.getCoord(capteur.getCurrentColor());
+			cam.setRobot(coord.x, coord.y, indiceRobot);
+			
 			i = (i + 1) % 10;
 			miseAJour(i);
 			if(i == 0){ //l'angle a été mis a jour
@@ -273,7 +277,11 @@ public class Strategie implements APIStrategie {
 			seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
 			moteurs.avancer();
 			while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
-				Delay.msDelay(50);
+				Delay.msDelay(100);
+				
+				Point coord = capteur.getCoord(capteur.getCurrentColor());
+				cam.setRobot(coord.x, coord.y, indiceRobot);
+				
 				miseAJour(i);
 				i = (i + 1) % 11;
 				if(i == 0){ //l'angle a été mis a jour

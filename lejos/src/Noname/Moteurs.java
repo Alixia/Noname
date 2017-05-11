@@ -23,7 +23,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
  	private boolean avance;
     
  	//gestion des vitesses
-    private static float maxVitesseRoue = 500;
+    private static float maxVitesseRoue = 400;
     private float vitesseRoues;
     
     //gestion de l'angle

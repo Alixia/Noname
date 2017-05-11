@@ -77,7 +77,7 @@ public class TestStrategie {
 	public static void main(String[] args) {
 
 		Moteurs m = new Moteurs();
-		Pince p = new Pince(true);
+		Pince p = new Pince(false);
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p, true);
 		//tourSensAntiHoraire(s);
