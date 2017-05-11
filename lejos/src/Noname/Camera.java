@@ -46,7 +46,7 @@ public class Camera implements Runnable {
 	
 	final private int MOUVEMENTMAXPALET = 4;
 
-	final private int nbPal = 9;
+	final private int nbPal = 3;
 	final private int nbRob = 2;
 
 	// Constructeur
@@ -253,7 +253,6 @@ public class Camera implements Runnable {
 	}
 
 	private void MAJCoords(String msg) {
-		System.out.println(afficheElements());
 		boolean[] bElements = new boolean[nbTot];
 		tabCollisions = new boolean[nbTot][nbTot];
 		// Initialise toutes les collisions a faux
@@ -284,7 +283,6 @@ public class Camera implements Runnable {
 				int diffX = buffer[currentElt][X] - tabElements[i][X];
 				int diffY = buffer[currentElt][Y] - tabElements[i][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;
@@ -438,7 +436,6 @@ public class Camera implements Runnable {
 				int diffX = setRobotX - tabElements[currentElt][X];
 				int diffY = setRobotX - tabElements[currentElt][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;

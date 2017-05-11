@@ -78,10 +78,10 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		pilot.setAngularSpeed(vitesse);
 		if(aGauche){
 			pilot.rotate(i*-1);
-			this.angle = angle - i ;
+			this.angle = angle + i ;
 		}else{
 			pilot.rotate(i);
-			this.angle = angle + i;
+			this.angle = angle - i;
 		}
 		while(angle >= 360){
 			this.angle -= 360;
