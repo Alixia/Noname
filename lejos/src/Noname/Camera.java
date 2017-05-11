@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Camera implements Runnable {
+	private boolean DEBUG = false;
+
+	
 	// GESTION DES COLLISIONS
 	private boolean[][] tabCollisions; // Tableau gerant les collisions
 	private Set<Integer> collisionsRobot1; // Collisions du robot 1
@@ -46,7 +49,7 @@ public class Camera implements Runnable {
 	
 	final private int MOUVEMENTMAXPALET = 4;
 
-	final private int nbPal = 9;
+	final private int nbPal = 3;
 	final private int nbRob = 2;
 
 	// Constructeur
@@ -163,24 +166,28 @@ public class Camera implements Runnable {
 		numRobot = nr;
 	}
 
-	public String afficheCollisions() {
-		String buffer = "";
+	public void afficheCollisions() {
+		if(!DEBUG){return;}
+		
+		String buff = "";
 		int lignes = tabCollisions.length;
 		int colonnes = tabCollisions[0].length;
 		for (int i = 0; i < lignes; i++) {
 			for (int j = 0; j < colonnes; j++) {
 				if (tabCollisions[i][j]) {
-					buffer += "1 ";
+					buff += "1 ";
 				} else {
-					buffer += "0 ";
+					buff += "0 ";
 				}
 			}
-			buffer += "\n";
+			buff += "\n";
 		}
-		return buffer;
+		System.out.println(buff);
 	}
 
-	public String afficheElements() {
+	public void afficheElements() {
+		if(!DEBUG){return;}
+
 		String buff = "";
 		for (int i = 0; i < indicePalets.length; i++) {
 			buff += tabElements[indicePalets[i]][INDICE] + ":" + tabElements[indicePalets[i]][X] + " / "
@@ -191,25 +198,26 @@ public class Camera implements Runnable {
 			buff += tabElements[indiceRobots[i]][INDICE] + ":" + tabElements[indiceRobots[i]][X] + " / "
 					+ tabElements[indiceRobots[i]][Y] + "\n";
 		}
-		return buff;
+		System.out.println(buff);
 	}
 
-	public String afficheSurveillance() {
+	public void afficheSurveillance() {
+		if(!DEBUG){return;}
+
 		String buff = "";
-		// for (int i = 0; i < surveillance.length; i++) {
-		// buff += "i:" + i;
-		// buff += " index:" + surveillance[i].index;
-		// buff += " surv? " + surveillance[i].estSurveille;
-		// buff += " dist: " + surveillance[i].distance;
-		// buff += " mesures: " + surveillance[i].mesure;
-		// buff += " collision avec " + surveillance[i].indexCollision;
-		// buff += " pos: " + surveillance[i].posX + " / " +
-		// surveillance[i].posY;
-		// buff += "\n";
-		// }
-		return buff;
+		for (int i = 0; i < surveillance.length; i++) {
+			for(Surveillance s : surveillance[i]){
+				buff += s.toString();
+			}
+		}
+		System.out.println(buff);
 	}
-
+	
+	public void afficheTexte(String texte, int iter) {
+		if(!DEBUG){return;}
+		System.out.println("------- " + texte + " " + iter + "---------");
+	}
+	
 	public static void main(String[] args) {
 		Camera c = new Camera();
 		Thread t = new Thread(c);
@@ -219,6 +227,7 @@ public class Camera implements Runnable {
 	@Override
 	public void run() {
 		int iter = 0;
+		DEBUG = false;
 		try {
 			// Create a socket to listen on the port.
 			// DatagramSocket dsocket = new DatagramSocket(port);
@@ -236,8 +245,11 @@ public class Camera implements Runnable {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, dPacket.getLength());
-
+				afficheTexte("debut", iter);
 				MAJCoords(msg);
+				afficheElements();
+				afficheSurveillance();
+				afficheTexte("fin", iter);
 
 				dPacket.setLength(buffer.length);
 				// Thread.sleep(500);
@@ -253,7 +265,6 @@ public class Camera implements Runnable {
 	}
 
 	private void MAJCoords(String msg) {
-		System.out.println(afficheElements());
 		boolean[] bElements = new boolean[nbTot];
 		tabCollisions = new boolean[nbTot][nbTot];
 		// Initialise toutes les collisions a faux
