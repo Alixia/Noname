@@ -1,6 +1,7 @@
 package Noname;
  
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,6 +56,35 @@ public class Capteurs implements APICapteurs{
 		return echantillon[0];
 	}
 
+	public Point getCoord(Couleur c){
+		int x = -1;
+		int y = -1;
+		switch(c){
+		case rouge:
+			x= 150;
+			break;
+		case bleu:
+			y = 80;
+			break;
+		case vert:
+			y = 220;
+			break;
+		case jaune:
+			x=50;
+			break;
+		case blanc:
+			break;
+		case gris:
+			break;
+		case noir:
+			break;
+		default:
+			break;
+		}
+		
+		return new Point(x,y);
+		
+	}
 	
 	public void calibrerCouleur(Couleur couleur){
 		SampleProvider moyenne = new MeanFilter(colorimetre.getRGBMode(), 1);
