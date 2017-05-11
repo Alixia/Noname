@@ -158,9 +158,10 @@ public class Camera implements Runnable {
 		return tabRobots;
 	}
 
-	public void setRobot(int y, int nr) {
+	public void setRobot(int x, int y, int nr) {
 		setrobot = false;
 		setRobotY = y;
+		setRobotX = x;
 		numRobot = nr;
 	}
 
