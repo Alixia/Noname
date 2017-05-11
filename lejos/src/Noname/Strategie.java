@@ -86,17 +86,12 @@ public class Strategie implements APIStrategie {
 		// Position du robot
 		Point pos = new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
 		// Decalage du robot pour esquiver les palets
-		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x]) ? -25 : 25;
+		int delta = (tabRobot[indiceAdverse][x] > tabRobot[indiceRobot][x]) ? 20 : -20;
 		// Destination vers les cages
-		Point dest = new Point(tabRobot[indiceRobot][x] + delta, tabRobot[indiceRobot][y]);
-		seDirigerVers(pos, dest);
-		moteurs.avancer();
-		Delay.msDelay(1200);
 		moteurs.arreter();
+		moteurs.tourner(delta, true, 120);
+		moteurs.avancer();
 		miseAJour(1);
-		pos.move(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]);
-		dest.move(tabRobot[indiceRobot][x], yCage);
-		seDirigerVers(pos, dest);
 		// Tant qu'on a pas traverse la ligne blanche
 		boolean enCours = true;
 		while (enCours) {
@@ -130,7 +125,6 @@ public class Strategie implements APIStrategie {
 			tangenteTeta = Math.abs((double)(positionRobot.x - destination.x)
 						/ (double)(positionRobot.y - destination.y));
 			teta = Math.toDegrees(Math.atan(tangenteTeta));
-			System.out.println("angle calculé!!!! "+teta);
 			if(positionRobot.y > destination.y){
 				if(positionRobot.x > destination.x){
 					teta = 180 - teta;
@@ -145,18 +139,10 @@ public class Strategie implements APIStrategie {
 				}
 			}
 		}
-
-		System.out.println("tangente teta "+tangenteTeta);
-		System.out.println("angle!!!! "+teta);
-		System.out.println("p1 "+ positionRobot);
-		System.out.println("p2 "+ destination);
 		
 		double angleAFaire =  moteurs.getAngle();
 		angleAFaire = teta - angleAFaire;
-		
-
-		System.out.println("angle!!!! avec soustraction "+ angleAFaire);
-		
+				
 		if(angleAFaire >= 360){
 			angleAFaire -= 360;
 		}else if(angleAFaire < 0){
@@ -165,12 +151,8 @@ public class Strategie implements APIStrategie {
 		
 		if(angleAFaire > 180){
 			moteurs.tourner(360 - angleAFaire, false, 120);
-			System.out.println("angle!!!! apres droit "+ (360 - angleAFaire));
-
 		}else{
 			moteurs.tourner(angleAFaire, true, 120);
-			System.out.println("angle!!!! apres gauche "+ angleAFaire);
-
 		}
 		
 	}
@@ -184,9 +166,6 @@ public class Strategie implements APIStrategie {
 		boolean estTrouve = false;
 		double distancePrec = 5000;
 		for (int i = 0; i < tabPallet.length; i++) {
-			// System.out.println("1 taille tabPallet[i][y] : " +tabPallet[i][y]
-			// + " yMin : " + yMin);
-			// System.out.println("1 taille yMax " +yMax );
 			if ((tabPallet[i][y] > yMin + 15) && (tabPallet[i][y] < yMax - 15)) {
 				double distanceEnCours = Math.sqrt(Math.pow(tabPallet[i][x] - tabRobot[indiceRobot][x], 2)
 						+ Math.pow(tabPallet[i][y] - tabRobot[indiceRobot][y], 2));
@@ -203,7 +182,6 @@ public class Strategie implements APIStrategie {
 		if (estTrouve) {
 			plusProche = new Point(tabPallet[indicePalletPlusProche][x], tabPallet[indicePalletPlusProche][y]);
 		}
-		System.out.println("Je vais au point : (" + tabPallet[indicePalletPlusProche][x] + ";"+ tabPallet[indicePalletPlusProche][y]+")");
 		return plusProche;
 	}
 
@@ -215,14 +193,16 @@ public class Strategie implements APIStrategie {
 
 		// prendre en compte les erreurs potentielles du aux angles
 		// prendre en compte les obstacle
-		int i = 1;
-		while (!capteur.boutonEstPresse()) {
-			Delay.msDelay(100);
-			miseAJour(i);
+		int i = 0;
+		while (!capteur.boutonEstPresse() && !capteur.getCurrentColor().equals(Couleur.blanc)) {
+			Delay.msDelay(50);
 			i = (i + 1) % 10;
+			miseAJour(i);
 			if(i == 0){ //l'angle a été mis a jour
 				if((Math.abs(tabRobot[indiceRobot][x] - pallet.x) < 30 ) &&( Math.abs(tabRobot[indiceRobot][y] - pallet.y) < 30)){
+					System.out.println("modif angle! " + i);
 					moteurs.arreter();
+					Delay.msDelay(200);
 					seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), pallet);
 					moteurs.avancer();
 				}
@@ -293,13 +273,13 @@ public class Strategie implements APIStrategie {
 			seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
 			moteurs.avancer();
 			while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
-				Delay.msDelay(100);
+				Delay.msDelay(50);
 				miseAJour(i);
-				/*i = (i + 1) % 11;
+				i = (i + 1) % 11;
 				if(i == 0){ //l'angle a été mis a jour
 					seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
 					moteurs.avancer();
-				}*/
+				}
 			}
 			if(!(tabRobot[indiceRobot][y] > (yCage - 50) && tabRobot[indiceRobot][y] < (yCage + 50))){
 				mauvaisCamp = true;
@@ -348,8 +328,6 @@ public class Strategie implements APIStrategie {
 			switch (etat) {
 			case NOPALLET:
 				pallet = detecterPlusProchePallet();
-				System.out.println("Je suis au point : (" + tabRobot[indiceRobot][x] + ";"+ tabRobot[indiceRobot][y]+")");
-				System.out.println("Angle : " + moteurs.getAngle());
 				// il n'y a plus de pallet à aller chercher
 				if (pallet.x == -1) {
 					boucle = false;
