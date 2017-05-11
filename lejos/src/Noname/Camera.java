@@ -451,15 +451,23 @@ public class Camera implements Runnable {
 				}
 			}
 		}
-		if (setrobot){
+		if (setrobot && ((setRobotX != -1) || (setRobotY != -1))){
 			
-
+			
 			double minDistance = 500;
 			int indexMinDistance = 0;
 			
 			for (int currentElt = 0; currentElt < tabElements.length; currentElt++) {
+				
 				int diffX = setRobotX - tabElements[currentElt][X];
-				int diffY = setRobotX - tabElements[currentElt][Y];
+				int diffY = setRobotY - tabElements[currentElt][Y];
+				
+				if(setRobotX == -1){
+					diffX = 0;
+				}
+				if(setRobotY == -1){
+					diffY = 0;
+				}
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
