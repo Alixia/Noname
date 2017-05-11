@@ -45,7 +45,7 @@ public class Camera implements Runnable {
 	final private int Y = 2;
 
 	// VAR. GLOBALES
-	final private int nbMesures = 15;
+	final private int nbMesures = 5;
 	
 	final private int MOUVEMENTMAXPALET = 4;
 
@@ -285,7 +285,8 @@ public class Camera implements Runnable {
 		}
 
 		int nbProbRobots = 0;
-		int indProbRobot = -1;
+		int indProbRobot1 = -1;
+		int indProbRobot2 = -1;
 		for (int i = 0; i < nbTot; i++) {
 
 			double minDistance = 500;
@@ -295,7 +296,6 @@ public class Camera implements Runnable {
 				int diffX = buffer[currentElt][X] - tabElements[i][X];
 				int diffY = buffer[currentElt][Y] - tabElements[i][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;
@@ -304,21 +304,33 @@ public class Camera implements Runnable {
 			}
 			if(minDistance > MOUVEMENTMAXPALET){
 				nbProbRobots++;
-				indProbRobot = i;
+				if(indProbRobot1 == -1)
+					indProbRobot1 = i;
+				else
+					indProbRobot1 = i;
 			}
 			tabElements[i][X] = buffer[indexMinDistance][X];
 			tabElements[i][Y] = buffer[indexMinDistance][Y];
 			buffer[indexMinDistance][INDICE]++;
 
 		}
-
-		if(nbProbRobots == 1 && !estRobot(indProbRobot)){
-			int echangeX = tabElements[indiceRobots[numRobot]][X];
-			int echangeY = tabElements[indiceRobots[numRobot]][Y];
-			tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot][X];
-			tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot][Y];
-			tabElements[indProbRobot][X] = echangeX;
-			tabElements[indProbRobot][Y] = echangeY;
+		if(nbProbRobots == 2){
+			if(!estRobot(indProbRobot1)){
+				int echangeX = tabElements[indiceRobots[numRobot]][X];
+				int echangeY = tabElements[indiceRobots[numRobot]][Y];
+				tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot1][X];
+				tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot1][Y];
+				tabElements[indProbRobot1][X] = echangeX;
+				tabElements[indProbRobot1][Y] = echangeY;
+			}
+			if(!estRobot(indProbRobot2)){
+				int echangeX = tabElements[indiceRobots[numRobot]][X];
+				int echangeY = tabElements[indiceRobots[numRobot]][Y];
+				tabElements[indiceRobots[numRobot]][X] = tabElements[indProbRobot2][X];
+				tabElements[indiceRobots[numRobot]][Y] = tabElements[indProbRobot2][Y];
+				tabElements[indProbRobot2][X] = echangeX;
+				tabElements[indProbRobot2][Y] = echangeY;
+			}
 		}
 		
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
@@ -449,7 +461,6 @@ public class Camera implements Runnable {
 				int diffX = setRobotX - tabElements[currentElt][X];
 				int diffY = setRobotX - tabElements[currentElt][Y];
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-				// System.out.println("currentP = " + current );
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
 					minDistance = currentDistance;

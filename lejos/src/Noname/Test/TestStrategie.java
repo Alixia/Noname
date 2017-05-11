@@ -81,6 +81,7 @@ public class TestStrategie {
 		Capteurs c = new Capteurs();
 		Strategie s = new Strategie(c, m, p, true);
 		//tourSensAntiHoraire(s);
+		//premiereEtape(m, p, c, s);
 		s.run();
 		s.stop();
 	}

@@ -23,7 +23,7 @@ public class Moteurs implements APIMoteurs, MoveListener {
  	private boolean avance;
     
  	//gestion des vitesses
-    private static float maxVitesseRoue = 200;
+    private static float maxVitesseRoue = 500;
     private float vitesseRoues;
     
     //gestion de l'angle
@@ -78,10 +78,10 @@ public class Moteurs implements APIMoteurs, MoveListener {
 		pilot.setAngularSpeed(vitesse);
 		if(aGauche){
 			pilot.rotate(i*-1);
-			this.angle = angle - i ;
+			this.angle = angle + i ;
 		}else{
 			pilot.rotate(i);
-			this.angle = angle + i;
+			this.angle = angle - i;
 		}
 		while(angle >= 360){
 			this.angle -= 360;
