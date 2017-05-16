@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Camera implements Runnable {
-	private boolean DEBUG = false;
+	private final boolean DEBUG = false;
 
 	
 	// GESTION DES COLLISIONS
@@ -160,9 +160,10 @@ public class Camera implements Runnable {
 		return tabRobots;
 	}
 
-	public void setRobot(int y, int nr) {
+	public void setRobot(int x, int y, int nr) {
 		setrobot = false;
 		setRobotY = y;
+		setRobotX = x;
 		numRobot = nr;
 	}
 
@@ -227,7 +228,6 @@ public class Camera implements Runnable {
 	@Override
 	public void run() {
 		int iter = 0;
-		DEBUG = true;
 		try {
 			// Create a socket to listen on the port.
 			// DatagramSocket dsocket = new DatagramSocket(port);
@@ -318,6 +318,7 @@ public class Camera implements Runnable {
 			double minDistance = 500;
 			int indexMinDistance = 0;
 
+			//match des positions precedentes avec la position actuelle la plus proche
 			for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
 				int diffX = buffer[currentElt][X] - tabElements[i][X];
 				int diffY = buffer[currentElt][Y] - tabElements[i][Y];
@@ -331,7 +332,6 @@ public class Camera implements Runnable {
 			if (minDistance > MOUVEMENTMAXPALET) {
 				indProbRobot[nbProbRobots] = i;
 				nbProbRobots++;
-				System.out.println("aaaaaaaaaaaaaaaaaaaaa");
 			}
 			tabElements[i][X] = buffer[indexMinDistance][X];
 			tabElements[i][Y] = buffer[indexMinDistance][Y];
@@ -342,14 +342,13 @@ public class Camera implements Runnable {
 		
 		
 
-		//swap des prob robots avec les robots si necessaire
+		//swap des prob (elements qui ont bougé) robots avec les robots si necessaire
 		for(int r : indiceRobots){
 			boolean contains = false;
 			double minDistance = 500;
 			int indexMinDistance = -1;
 			for(int i = 0; i<nbProbRobots; i++){
 				int e = indProbRobot[i];
-				System.out.println("zzzzz");
 				if(e == r){
 					contains = true;
 					break;
@@ -370,7 +369,7 @@ public class Camera implements Runnable {
 		
 		
 		
-
+		//si de nouveaux point apparaissent, c'est qu'on est sorti d'une colision
 		affichetruc("462 debut gestion des colisions",0);
 		for (int currentElt = 0; currentElt < buffer.length; currentElt++) {
 			if (buffer[currentElt][INDICE] == 0) {
@@ -438,7 +437,7 @@ public class Camera implements Runnable {
 					 * } }
 					 */
 				}
-				else{
+				else{ //cas ou la colision avait été mal gérée, on va chercher un element ailleur
 					minDistance = 500;
 					int indSwap = -1;
 					for(int e1 = 0; e1 < tabElements.length -1; e1++){
@@ -457,6 +456,7 @@ public class Camera implements Runnable {
 		}
 
 
+		// gestion ds surveillance pour attribuer le bon objet au bon endroit au sortir d'une colision (c'est sans doute devenu obsolete)
 		affichetruc("549 debut surveillances",0);
 		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
 			boolean aEteEchange = false;// permet de savoir si il a deja ete
@@ -514,16 +514,23 @@ public class Camera implements Runnable {
 			}
 		}
 
+		// si le thread principal veux indiquer la position reel du robot
 		affichetruc("606 debut setrobot",0);
-		
-		if (setrobot) {
-
+		if (setrobot && ((setRobotX != -1) || (setRobotY != -1))){
 			double minDistance = 500;
 			int indexMinDistance = 0;
 
 			for (int currentElt = 0; currentElt < tabElements.length; currentElt++) {
+				
 				int diffX = setRobotX - tabElements[currentElt][X];
-				int diffY = setRobotX - tabElements[currentElt][Y];
+				int diffY = setRobotY - tabElements[currentElt][Y];
+				
+				if(setRobotX == -1){
+					diffX = 0;
+				}
+				if(setRobotY == -1){
+					diffY = 0;
+				}
 				double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
 				// Trouver la plus courte distance
 				if (minDistance > currentDistance) {
