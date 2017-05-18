@@ -94,18 +94,15 @@ public class Strategie implements APIStrategie {
 		miseAJour(1);
 		// Tant qu'on a pas traverse la ligne blanche
 		boolean enCours = true;
+		moteurs.avancer();
 		while (enCours) {
-			moteurs.avancer();
-			while (enCours && ((Math.abs(tabRobot[indiceAdverse][x] - tabRobot[indiceRobot][x]) > 20)
-					|| (Math.abs(tabRobot[indiceAdverse][y] - tabRobot[indiceRobot][y]) > 40))) {
-				Delay.msDelay(10);
-				if (capteur.getCurrentColor().equals(Couleur.blanc)) {
-					enCours = false;
-				}
-				miseAJour(1);
+			Delay.msDelay(10);
+			if (capteur.getCurrentColor().equals(Couleur.blanc)) {
+				enCours = false;
 			}
-			moteurs.arreter();
+			miseAJour(1);
 		}
+		moteurs.arreter();
 		pince.ouvrirPince();
 		moteurs.reculer();
 		Delay.msDelay(500);
@@ -195,10 +192,12 @@ public class Strategie implements APIStrategie {
 		// prendre en compte les obstacle
 		int i = 0;
 		while (!capteur.boutonEstPresse() && !capteur.getCurrentColor().equals(Couleur.blanc)) {
-			Delay.msDelay(100);
+			Delay.msDelay(10);
 
 			Point coord = capteur.getCoord(capteur.getCurrentColor());
-			cam.setRobot(coord.x, coord.y, indiceRobot);
+			if(!(coord.x == -1 && coord.y == -1)){
+				cam.setRobot(coord.x, coord.y, indiceRobot);
+			}
 			
 			i = (i + 1) % 10;
 			miseAJour(i);
@@ -277,10 +276,12 @@ public class Strategie implements APIStrategie {
 			seDirigerVers(new Point(tabRobot[indiceRobot][x], tabRobot[indiceRobot][y]), new Point(100, yCage));
 			moteurs.avancer();
 			while (!capteur.getCurrentColor().equals(Couleur.blanc)) {
-				Delay.msDelay(100);
+				Delay.msDelay(10);
 				
 				Point coord = capteur.getCoord(capteur.getCurrentColor());
-				cam.setRobot(coord.x, coord.y, indiceRobot);
+				if(!(coord.x == -1 && coord.y == -1)){
+					cam.setRobot(coord.x, coord.y, indiceRobot);
+				}
 				
 				miseAJour(i);
 				i = (i + 1) % 11;

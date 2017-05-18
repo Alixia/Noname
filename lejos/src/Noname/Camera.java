@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Camera implements Runnable {
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 
 	
 	// GESTION DES COLLISIONS
@@ -49,7 +49,7 @@ public class Camera implements Runnable {
 	final private int MOUVEMENTMAXPALET = 4;
 	final private int MIN_DISTANCE_SWAP_ROBOT_PALET = 100;
 
-	final private int nbPal = 3;
+	final private int nbPal = 9;
 	final private int nbRob = 1;
 
 	// Constructeur
@@ -375,144 +375,23 @@ public class Camera implements Runnable {
 			if (buffer[currentElt][INDICE] == 0) {
 				ArrayList<Integer> collison = new ArrayList<>();
 				double minDistance = 500;
-				for (int i = 0; i < nbTot; i++) {
-					int diffX = buffer[currentElt][X] - tabElements[i][X];
-					int diffY = buffer[currentElt][Y] - tabElements[i][Y];
-					double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-					if (minDistance > currentDistance) {
-						minDistance = currentDistance;
-						collison.clear();
+				int indSwap = -1;
+				for(int e1 = 0; e1 < tabElements.length -1; e1++){
+					for(int e2 = e1 + 1; e2 < tabElements.length; e2++){
+						int diffX = buffer[currentElt][X] - tabElements[e1][X];
+						int diffY = buffer[currentElt][Y] - tabElements[e1][Y];
+						double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+						if(tabElements[e1][X] == tabElements[e2][X] && tabElements[e1][Y] == tabElements[e2][Y] && currentDistance < minDistance)
+							indSwap = estRobot(e1) ? e2 : e1;
 					}
-					if (minDistance == currentDistance) {
-						collison.add(i);
-					}
-				}
-				if(collison.size() >= 2){
-					if (buffer[currentElt][Y] < 25 || buffer[currentElt][Y] > 275) { // si nous somme dans une cage
-						for (int i = 0; i < collison.size(); i++) {// on met le robot au debut pour qu'il soit tous seul sur la surveillance
-							if (estRobot(collison.get(i))) {
-								int index = collison.get(i);
-								collison.set(i, collison.get(0));
-								collison.set(0, index);
-								break;
-							}
-						}
-					} else { // si nous ne somme pas dans une cage
-						for (int i = 0; i < collison.size(); i++) {// on met les palets au debut pour que le robot ne soit pas seul
-							if (!estRobot(collison.get(i))) {
-								int index = collison.get(i);
-								collison.set(i, collison.get(0));
-								collison.set(0, index);
-								break;
-							}
-						}
-					}
-	
-					// puis on crée les surveillances de tel sorte que le premier
-					// elements se retrouve tout seul et les autre restent en
-					// colisions
-	
-					/*
-					 * for (int i = 0; i < collison.size() - 1; i++) { for (int j =
-					 * i + 1; j < collison.size(); j++) {
-					 */
-					for (int j = 1; j < collison.size(); j++) {
-						tabElements[collison.get(0)][X] = buffer[currentElt][X];
-						tabElements[collison.get(0)][Y] = buffer[currentElt][Y];
-						Surveillance s = new Surveillance();
-						s.index1 = collison.get(0);
-						s.index2 = collison.get(j);
-						s.mesure = nbMesures;
-						s.pos1X = buffer[currentElt][X];
-						s.pos1Y = buffer[currentElt][Y];
-	
-						s.pos2X = tabElements[collison.get(j)][X];
-						s.pos2Y = tabElements[collison.get(j)][Y];
-	
-						surveillance[collison.get(0)].add(s);
-						surveillance[collison.get(j)].add(s);
-					}
-	
-					/*
-					 * } }
-					 */
-				}
-				else{ //cas ou la colision avait été mal gérée, on va chercher un element ailleur
-					minDistance = 500;
-					int indSwap = -1;
-					for(int e1 = 0; e1 < tabElements.length -1; e1++){
-						for(int e2 = e1 + 1; e2 < tabElements.length; e2++){
-							int diffX = buffer[currentElt][X] - tabElements[e1][X];
-							int diffY = buffer[currentElt][Y] - tabElements[e1][Y];
-							double currentDistance = Math.sqrt(diffX * diffX + diffY * diffY);
-							if(tabElements[e1][X] == tabElements[e2][X] && tabElements[e2][Y] == tabElements[e2][Y] && currentDistance < minDistance)
-								indSwap = estRobot(e1) ? e2 : e1;
-						}
-					}
-					tabElements[indSwap][X] = buffer[currentElt][X];
-					tabElements[indSwap][Y] = buffer[currentElt][Y];
-				}
+				}System.out.println("aaaaaaaaaaaaaaaaaaa");
+				tabElements[indSwap][X] = buffer[currentElt][X];
+				tabElements[indSwap][Y] = buffer[currentElt][Y];
 			}
 		}
 
 
-		// gestion ds surveillance pour attribuer le bon objet au bon endroit au sortir d'une colision (c'est sans doute devenu obsolete)
-		affichetruc("549 debut surveillances",0);
-		for (int monIndex = 0; monIndex < surveillance.length; monIndex++) {
-			boolean aEteEchange = false;// permet de savoir si il a deja ete
-										// echangé, pour eviter qu'il se
-										// retrouve en surveillance avec un
-										// autre element de même coordonnées
-			int echangeX = -100;
-			int echangeY = -100;
-
-			for (Surveillance s : surveillance[monIndex]) {
-				// Si le compteur n'est pas fini
-				if (s.mesure > 0) {
-					s.mesure--;
-				} else { // Gestion des objets en collision
-
-					int pos1X = s.pos1X;
-					int pos1Y = s.pos1Y;
-
-					int diffX = pos1X - tabElements[s.index1][X];
-					int diffY = pos1Y - tabElements[s.index1][Y];
-					double distance1 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
-
-					int pos2X = s.pos2X;
-					int pos2Y = s.pos2Y;
-					diffX = pos2X - tabElements[s.index2][X];
-					diffY = pos2Y - tabElements[s.index2][Y];
-					double distance2 = Math.floor(Math.sqrt(diffX * diffX + diffY * diffY));
-
-					if (aEteEchange) {
-						tabElements[s.index2][X] = echangeX;
-						tabElements[s.index2][Y] = echangeY;
-					} else if (distance1 == distance2) {
-						s.mesure++;
-					} else if (((distance1 < distance2) == estRobot(monIndex))) {
-
-						echangeX = tabElements[monIndex][X];
-						echangeY = tabElements[monIndex][Y];
-						tabElements[monIndex][X] = tabElements[s.index2][X];
-						tabElements[monIndex][Y] = tabElements[s.index2][Y];
-						tabElements[s.index2][X] = echangeX;
-						tabElements[s.index2][Y] = echangeY;
-
-						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
-						surveillance[autreIndex].remove(s);
-						surveillance[monIndex].remove(s);
-						aEteEchange = true;
-						break;
-					} else {
-						int autreIndex = s.index1 == monIndex ? s.index2 : s.index1;
-						surveillance[autreIndex].remove(s);
-						surveillance[monIndex].remove(s);
-						break;
-					}
-				}
-			}
-		}
+		
 
 		// si le thread principal veux indiquer la position reel du robot
 		affichetruc("606 debut setrobot",0);
